@@ -34,6 +34,8 @@ my %CONVOS_MESSAGE = (
 
 Holds a L<Mojo::Log> object.
 
+=head2 proxy
+
 =head2 redis
 
 Holds a L<Mojo::Redis> object.
@@ -41,6 +43,7 @@ Holds a L<Mojo::Redis> object.
 =cut
 
 has log   => sub { Mojo::Log->new };
+has proxy => sub { Convos::Proxy->new };
 has redis => sub { Mojo::Redis->new };
 
 =head1 METHODS
@@ -156,6 +159,12 @@ sub start {
       my ($delay) = @_;
       $self->reset;
       $self->redis->smembers('connections', $delay->begin);
+      $self->proxy->listen(
+        port => $ENV{CONVOS_PROXY_PORT} || 16667,
+        tls => 1,
+        tls_cert => Mojo::IRC::DEFAULT_CERT,
+        tls_key  => Mojo::IRC::DEFAULT_KEY,
+      );
     },
     sub {
       my ($delay, $connections) = @_;

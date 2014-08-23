@@ -3,6 +3,8 @@ package Convos::Proxy;
 
 use Mojo::Base 'Mojo::IOLoop::Server';
 
+# [connection] <--> [core] <--> [proxy]
+
 
 has tls => undef;
 has 'connection';

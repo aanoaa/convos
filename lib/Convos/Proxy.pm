@@ -17,11 +17,13 @@ sub start {
       my $irc    = Mojo::IRC->new();
       $irc->{stream} = $stream;
       $irc->write('AUTH');
-    ) $stream->on(read => sub { $self->_read($_[1]) });
-    }) $self->SUPER::start(@_);
+      $stream->on(read => sub { $self->_read($_[1]) });
+    }
+  );
+  $self->SUPER::start(@_);
 }
 
 sub _read {
-    my ($self, $id, $chunk) = @_;
+  my ($self, $id, $chunk) = @_;
 }
 1;

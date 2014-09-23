@@ -18,7 +18,9 @@ sub start {
       my $stream = Mojo::IOLoop::Stream->new($handle);
       my $irc    = Mojo::IRC->new();
       $irc->{stream} = $stream;
-      $irc->write('AUTH');
+      $irc->write("NOTICE AUTH: Welcome to convos\n");
+      $irc->write(
+        "NOTICE AUTH: Welcome to please authenticate with your reglar l/p');
       $stream->on(read => sub { $self->_read($_[1]) });
     }
   );

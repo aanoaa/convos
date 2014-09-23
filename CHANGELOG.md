@@ -1,9 +1,46 @@
-## 0.82
-- Requires Mojolicious 5.16
+## 0.84 (2014-09-14)
+- Fix update of current nick()
+- Fix refreshing conversation and navbar when clicking back/forward buttons in browser #111
+- Fix vendor/bin/carton can be run with Perl 5.12 #144
+- Fix commands are now case insensitive #168
+- Improved registration process #121
+- Improved README.md #182
+- Add auto-detect of TLS #121
+- Add prompt user to join a channel on connect #121
+- Add support for /list to show channel list #131
+- Add support for password protected server connection #159
+- Add support for archive of IRC log to disk or ElasticSearch #172
+- Change welcome message and prompt the user to join a channel on first connect #121
+- Change to showing server messages after first time register #121
+- Change to Mojolicious::Plugin::FontAwesome4 for icons #162
+- Remove support for Heroku #177
+- Include NOTICE in messages
+
+## 0.83 (2014-09-01)
+- Fix highlighting of multiple channels #137
+- Fix connection actions in sidebar #157
+- Fix autocomplete will not match offline nicks #129
+- Add number of participants #136
+- Add /names will be displayed with nick modes #138
+- Add visual indicator for when a new day starts #149
+- Add down arrow to clear input field #151
+- Add support for kicked event #134
+- Add highlight for new messages since last time window had focus #56
+- Add /kick command #134
+- Various UI improvements (Flatten, highlights/background go all out) #145, #146, #147, #162
+
+## 0.82 (2014-08-24)
+- Requires IO::Socket::SSL 1.84
+- Requires Mojolicious 5.30
 - Fix nicks starting with special character, #130
 - Fix jumpy text when sending a message
 - Fix invite only template styling
-- Testing out Heroku deploy button, #120
+- Fix /help command and add click actions
+- Fix missing special characters in nicks, #130
+- Default to no CONVOS_INVITE_CODE in Dockerfile, #118
+- Improvements on Android, #132
+- Fetch avatar on client side, #133
+- Will remember channel key on "/join #channel s3cret", #127
 
 ## 0.81 (2014-08-07)
 - Fix typos in Docker file #114

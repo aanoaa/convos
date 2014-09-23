@@ -49,73 +49,74 @@ Used to render the main IRC client conversation.
 =cut
 
 sub conversation {
-  my $self      = shift;
-  my $prev_name = $self->session('name') || '';
-  my $login     = $self->session('login');
-  my $network   = $self->stash('network');
-  my $target    = $self->stash('target') || '';
-  my $name      = as_id $network, $target;
-  my $redis     = $self->redis;
-  my $full_page = $self->stash('full_page');
-  my @rearrange = ([zscore => "user:$login:conversations", $name]);
+  my $self    = shift;
+  my $login   = $self->session('login');
+  my $network = $self->stash('network');
+  my $target  = $self->stash('target') || '';
+  my $name    = as_id $network, $target;
+  my $redis   = $self->redis;
+  my $time    = time;
 
-  if (TEST_IS_CHANNEL) {
-    $self->res->headers->header('X-Is-Channel', $self->stash('is_channel'));
-  }
-  if ($prev_name and $prev_name ne $name) {
-    push @rearrange, [zscore => "user:$login:conversations", $prev_name];
-  }
-
-  $self->session(name => $target ? $name : '');
-  $self->stash(from_archive => 0, target => $target, state => 'connected');
+  $self->res->headers->header('X-Is-Channel', $self->stash('is_channel') || 0);
+  $self->stash(from_archive => 0, target => $target, state => 'connected', time => $time);
 
   $self->delay(
     sub {
       my ($delay) = @_;
-      $redis->execute(@rearrange, $delay->begin);    # make sure conversations exists before doing zadd
+      my $nid = $self->param('nid') || undef;
+
+      # make sure conversations exists before doing zadd
+      $redis->zscore("user:$login:conversations", $name, $delay->begin);
+      $redis->zrevrange("user:$login:conversations", 0, 1, $delay->begin);
+      $self->_modify_notification($nid, read => 1, sub { }) if defined $nid;
     },
     sub {
-      my ($delay, @score) = @_;
-      my $time = time;
+      my ($delay, $last_read_time, $previous_name) = @_;
 
-      if ($target and !$score[0]) {                  # no such conversation
-        return $delay->begin(0)->([$login, 'connected']) if $self->param('from');
+      $self->stash(last_read_time => $self->param('last-read-time') || $last_read_time || 0);
+      $delay->pass;    # make sure we get to the next step
+
+      if ($target and !$last_read_time) {    # no such conversation
+        return $delay->pass if $self->param('from');
         return $self->stash(layout => 'tactile')->render_not_found;
       }
       if (!$target) {
         $self->stash(sidebar => 'convos');
       }
-      if ($network eq 'convos') {
-        return $delay->begin(0)->([$login, 'connected']);
+      if ($last_read_time) {
+        $redis->zadd("user:$login:conversations", $time, $previous_name->[0], $delay->begin)
+          unless $name eq $previous_name->[0];
+        $redis->zadd("user:$login:conversations", $time + 0.01, $name, $delay->begin);
       }
-
-      $redis->hmget("user:$login:connection:$network", qw( current_nick nick state ), $delay->begin);
-      $redis->zadd("user:$login:conversations", $time + 0.001, $name)      if $score[0];
-      $redis->zadd("user:$login:conversations", $time,         $prev_name) if $score[1];
     },
     sub {
-      my $delay        = shift;
-      my $current_nick = shift @{$_[0]};
-      my $wanted_nick  = shift @{$_[0]};
-      my $state        = shift @{$_[0]};
+      my $delay = shift;
+      $self->conversation_list($delay->begin);
+      $self->notification_list($delay->begin) if $self->stash('full_page');
+    },
+    sub {
+      my ($delay, $conversation_list, $notification_list) = @_;
 
-      if (length $self->param('nid')) {
-        $self->_modify_notification($self->param('nid'), read => 1, sub { });
+      if ($network eq 'convos') {
+        $network = $self->stash->{networks}[0] if @{$self->stash->{networks}} == 1;
+        $self->stash(network => $network);
+      }
+      if ($network eq 'convos') {
+        $delay->pass([$login, $login, 'connected']);
+      }
+      else {
+        $redis->hmget("user:$login:connection:$network", qw( current_nick nick state ), $delay->begin);
       }
 
-      $state ||= 'disconnected';
-      $self->stash(current_nick => $current_nick || $wanted_nick, state => $state);
       $self->_conversation($delay->begin);
     },
     sub {
-      my ($delay, $conversation) = @_;
-
-      $self->conversation_list($delay->begin);
-      $self->notification_list($delay->begin) if $full_page;
-      $self->stash(conversation => $conversation || []);
-    },
-    sub {
-      $self->render;
+      my ($delay, $data, $conversation) = @_;
+      $self->render(
+        conversation => $conversation || [],
+        current_nick => $data->[0]    || $data->[1],
+        state        => $data->[2]    || 'disconnected'
+      );
     },
   );
 }

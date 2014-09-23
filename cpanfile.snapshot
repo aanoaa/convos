@@ -19,6 +19,22 @@ DISTRIBUTIONS
       Getopt::Std 0
       Test::More 0.80
       Test::Script 1.05
+  IO-Socket-SSL-1.997
+    pathname: S/SU/SULLR/IO-Socket-SSL-1.997.tar.gz
+    provides:
+      IO::Socket::SSL 1.997
+      IO::Socket::SSL::Intercept 1.93
+      IO::Socket::SSL::OCSP_Cache 1.997
+      IO::Socket::SSL::OCSP_Resolver 1.997
+      IO::Socket::SSL::PublicSuffix undef
+      IO::Socket::SSL::SSL_Context 1.997
+      IO::Socket::SSL::SSL_HANDLE 1.997
+      IO::Socket::SSL::Session_Cache 1.997
+      IO::Socket::SSL::Utils 0.03
+    requirements:
+      ExtUtils::MakeMaker 0
+      Net::SSLeay 1.46
+      Scalar::Util 0
   IPC-Run3-0.046
     pathname: R/RJ/RJBS/IPC-Run3-0.046.tar.gz
     provides:
@@ -54,10 +70,10 @@ DISTRIBUTIONS
       File::Spec 0
       Test::More 0
       perl 5.006001
-  Mojo-IRC-0.10
-    pathname: J/JH/JHTHORSEN/Mojo-IRC-0.10.tar.gz
+  Mojo-IRC-0.11
+    pathname: J/JH/JHTHORSEN/Mojo-IRC-0.11.tar.gz
     provides:
-      Mojo::IRC 0.10
+      Mojo::IRC 0.11
     requirements:
       ExtUtils::MakeMaker 0
       IRC::Utils 0.12
@@ -189,10 +205,13 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 0
       Pod::Simple 3.09
-  Mojolicious-Plugin-AssetPack-0.19
-    pathname: J/JH/JHTHORSEN/Mojolicious-Plugin-AssetPack-0.19.tar.gz
+  Mojolicious-Plugin-AssetPack-0.23
+    pathname: J/JH/JHTHORSEN/Mojolicious-Plugin-AssetPack-0.23.tar.gz
     provides:
-      Mojolicious::Plugin::AssetPack 0.19
+      Mojolicious::Plugin::AssetPack 0.23
+      Mojolicious::Plugin::AssetPack::Preprocessor undef
+      Mojolicious::Plugin::AssetPack::Preprocessor::Sass undef
+      Mojolicious::Plugin::AssetPack::Preprocessor::Scss undef
       Mojolicious::Plugin::AssetPack::Preprocessors 0.01
     requirements:
       CSS::Minifier::XS 0.01
@@ -200,7 +219,16 @@ DISTRIBUTIONS
       File::Which 1.00
       IPC::Run3 0.04
       JavaScript::Minifier::XS 0.01
-      Mojolicious 4.30
+      Mojolicious 5.00
+      Test::More 0.88
+  Mojolicious-Plugin-FontAwesome4-4.1000
+    pathname: J/JH/JHTHORSEN/Mojolicious-Plugin-FontAwesome4-4.1000.tar.gz
+    provides:
+      Mojolicious::Plugin::FontAwesome4 4.1000
+    requirements:
+      ExtUtils::MakeMaker 0
+      Mojolicious 5.00
+      Mojolicious::Plugin::AssetPack 0.22
       Test::More 0.88
   Mojolicious-Plugin-LinkEmbedder-0.07
     pathname: J/JH/JHTHORSEN/Mojolicious-Plugin-LinkEmbedder-0.07.tar.gz
@@ -227,6 +255,16 @@ DISTRIBUTIONS
       Module::Find 0.10
       Mojolicious 5.00
       Test::More 0.90
+  Net-SSLeay-1.66
+    pathname: M/MI/MIKEM/Net-SSLeay-1.66.tar.gz
+    provides:
+      Net::SSLeay 1.66
+      Net::SSLeay::Handle 0.61
+    requirements:
+      ExtUtils::MakeMaker 6.36
+      MIME::Base64 0
+      Test::More 0.60_01
+      perl 5.005
   Parse-IRC-1.20
     pathname: B/BI/BINGOS/Parse-IRC-1.20.tar.gz
     provides:
@@ -279,6 +317,14 @@ DISTRIBUTIONS
       Test::Builder::Tester 1.02
       Test::More 0.62
       blib 0
+  Time-Piece-1.27
+    pathname: R/RJ/RJBS/Time-Piece-1.27.tar.gz
+    provides:
+      Time::Piece 1.27
+      Time::Seconds 1.27
+    requirements:
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
   Try-Tiny-0.18
     pathname: D/DO/DOY/Try-Tiny-0.18.tar.gz
     provides:

@@ -5,63 +5,58 @@
   convos.at_bottom = true; // start ui scrolled to bottom
   convos.at_bottom_threshold = !!('ontouchstart' in window) ? 110 : 40;
   convos.current = {};
-  convos.draw = {};
   convos.isChannel = function(str) { return str.match(/^[#&]/); };
 
-  convos.draw['add-connection'] = function() {
-    var channels = {};
-    var s;
+  convos.on('channel-info', function(network, name, info) {
+    if (network != convos.current.network) return;
+    convos.current.channels = convos.current.channels || {};
+    convos.current.channels[name] = info;
+    $('div.messages ul .channel-list input').keyup();
+  });
 
-    $('select#name option').each(function() {
-      channels[this.value] = ($(this).attr('data-channels') || '').split(' ');
-    });
-    $('select#name').selectize({
-      create: false,
-      openOnFocus: true,
-      onChange: function(val) {
-        s.clearOptions();
-        s.addOption($.map(channels[val], function(i) { return { value: i, text: i,  }; }));
-        s.refreshOptions(false);
-        s.setValue(channels[val].join(' '));
-      }
-    }).trigger('change');
-    $('input#channels').selectize({
-      delimiter: ' ',
-      persist: false,
-      openOnFocus: true,
-      create: function(value) {
-        if (convos.isChannel(value)) value = '#' + value;
-        return { value: value, text: value };
-      }
+  convos.on('channel-list', function($message) {
+    var $dl = $message.find('dl');
+
+    // remove existing
+    $('div.messages ul .channel-list').each(function() { if ($message[0] != this) $(this).remove(); });
+
+    $message.contents().each(function() {
+      if (this.nodeType == 8) convos.current.channels = jQuery.parseJSON(this.nodeValue);
     });
 
-    s = $('input#channels')[0].selectize;
-  };
+    $message.find('input').on('keyup', function(e) { // filter channel list
+      var re = new RegExp(this.value, 'i');
+      var names = [];
+      var i = 0;
 
-  convos.draw['profile'] = function() {
-    var btn = $('.form-group.notifications').find('button');
-    var p = Notification.permission;
+      for (name in convos.current.channels) {
+        if (name.match(re)) names.push(name);
+      }
 
-    btn.text(p == 'granted' ? 'Enabled' : p);
-
-    if (Notification.permission == 'granted') {
-      btn.click(function(e) { $.notify.itWorks(); });
-    }
-    else {
-      Notification.requestPermission(function(s) {
-        if (s) Notification.permission = s;
-        btn.text(s);
-        $.notify.itWorks();
+      $dl.html('');
+      $.each(names.sort(function(a, b) { return a.length - b.length; }), function() {
+        if (i++ > 10) return false;
+        var data = convos.current.channels[this];
+        $dl.append('<dt><a href="cmd:///join ' + this + '">' + data.name + '</a> (' + data.visible +')</dt><dd title="' + data.title + '">' + (data.title || 'No topic') + '</dd>');
       });
-    }
-  };
 
-  convos.draw['ui'] = function() {
-    var menu_width = 0;
-    $('nav .right').add('nav ul.conversations a').each(function() { menu_width += $(this).outerWidth(); });
-    $('nav a.conversations')[ menu_width > $('body').outerWidth() ? 'addClass' : 'removeClass' ]('overlapping');
-    if (convos.at_bottom) $(window).scrollTo('bottom');
-  };
+      if (!$dl.children().length) $dl.append('<dt>No matching channel names.</dt>');
+    }).focus();
+
+    $message.find('form').on('submit', function(e) {
+      e.preventDefault();
+      var a = $dl.find('a')[0];
+      if (a) a.click();
+    });
+
+    // prevent jumping when filtering
+    $message.height($message.height() < 140 ? $message.height() * 5 : $message.height());
+    $(window).scrollTo('bottom');
+  });
+
+  convos.on('help', function($message) {
+    $('div.messages ul .help').each(function() { if ($message[0] != this) $(this).remove(); });
+  });
 
   convos.getNewerMessages = function(e) {
     if (e) e.preventDefault();
@@ -74,11 +69,33 @@
       $('body').removeClass('loading');
       if (!$li.length) return;
       convos.current.end_time = parseFloat($ul.data('end-time'));
+      convos.current.state = $ul.attr('data-state');
       $li.addToMessages();
     });
     convos.current.end_time = 0;
     $('body').addClass('loading');
   };
+
+  convos.makeMessage = function(content) {
+    var $m = $('<li class="message" data-sender="convos"></li>');
+    $m.append('<img class="avatar" src="' + $.url_for('/image/avatar-convos.png') + '">');
+    $m.append('<h3>convos</h3>');
+    $m.append('<div class="content">' + content + '</div>');
+    return $m;
+  };
+
+  var firstTimeConnected = convos.on('idle', function() {
+    if ($('nav .conversations a[data-network="' + convos.current.network + '"]').length) return convos.unsubscribe('idle', firstTimeConnected);
+    if (convos.current.state != 'connected') return;
+    convos.unsubscribe('idle', firstTimeConnected);
+    console.log('firstTimeConnected');
+    convos.makeMessage('Hi ' + convos.current.nick + '. Welcome to ' + convos.current.network + '.').addToMessages();
+    convos.makeMessage('Already know what channel you want to talk in? Press shift+enter or click the list icon next to the bell in the top menu, enter the channel name and click "Join" to add it to your connection.').addToMessages();
+    convos.makeMessage('Otherwise, please hold on while I try to fetch the server channel list for you. (It could take a while)').addToMessages();
+    convos.makeMessage('While you wait, try the help command: Type <b>/help</b> in the input field at the bottom on the page and hit enter. You can also use the &lt;tab> key to get suggestions for commands and nicks.').addToMessages();
+    convos.send('/list');
+    $(window).scrollTo('bottom');
+  });
 
   $.fn.addToMessages = function(func) { // func = {prepend,append}
     return this.attachEventsToMessage().each(function() {
@@ -91,7 +108,7 @@
         (func == 'prepend' ? $same : $message).addClass('same-nick');
       }
       if (!$message.hasClass('hidden')) {
-        $messages[func || 'append']($message.fadeIn('fast'));
+        $messages[func || 'append']($message);
       }
     });
   };
@@ -102,11 +119,14 @@
       $.pjax.click(e, { container: 'div.messages', fragment: 'div.messages' });
     });
     this.find('a.autocomplete').click(function(e) {
-      var str = $(this).text();
+      var str = this.href.match(/.*complete:\/\/(.+)/);
+      str = str ? str[1] : $(this).text();
+      if (str.indexOf('/') != 0 && convos.input.val().length == 0) str += ':';
+      if (convos.input.val().length) str = ' ' + str;
       e.preventDefault();
-      convos.input.val(convos.input.val() ? convos.input.val().replace(/\s+$/, '') + ' ' + str + ' ' : str + ': ').focus();
+      convos.input.val(convos.input.val().replace(/\s+$/, '') + str + ' ').focus();
     });
-    this.find('a[href^="http"]').each(function(e) {
+    this.find('a[href^="http"].external').each(function(e) {
       var $a = $(this);
       $.get($.url_for('/oembed'), { url: this.href }, function(embed_code) {
         var $embed_code = $(embed_code);
@@ -121,7 +141,6 @@
       $(this).replaceWith('<img src="' + $(this).attr('data-avatar') + '" class="avatar">');
     });
 
-    this.find('.close').click(function(e) { $(this).closest('li').remove(); });
     this.filter('.historic-message').find('a.button.newer').click(convos.getNewerMessages);
 
     return this;
@@ -147,7 +166,7 @@
   var getHistoricMessages = function() {
     if (!convos.current.start_time) return;
     var $loading = $('<li class="message notice"><div class="content">Loading historic messages...</div></li>');
-    $.get(location.href.replace(/\?.*/, ''), { to: convos.current.start_time }, function(data) {
+    $.get(location.href.replace(/\?.*/, ''), { 'last-read-time': convos.current.last_read_time, to: convos.current.start_time }, function(data) {
       var $ul = $(data).find('ul[data-network]');
       var $li = $ul.children('li:lt(-1)');
       var height_before_prepend = $('body').height();
@@ -162,6 +181,7 @@
   };
 
   var initPjax = function() {
+    $.pjax.defaults.maxCacheLength = 0; // Will refresh conversation when going back/forward, fixes #111
     $(document).on('pjax:timeout', function(e) { e.preventDefault(); });
     $(document).pjax('nav ul a', 'div.messages', { fragment: 'div.messages' });
     $(document).pjax('.sidebar-right a', 'div.messages', { fragment: 'div.messages' });
@@ -173,19 +193,24 @@
     $('div.messages').on('pjax:success', function(e, data, status_text, xhr, options) {
       var $doc = data.match(/<\w/) ? $(data) : $('body');
       var $messages = $('div.messages ul'); // injected to the document using pjax
-      var draw = $doc.find('[data-draw]').attr('data-draw');
 
-      convos.nicks.reset();
+      convos.emit('conversation-loaded', $doc);
+
+      convos.current.channels = {};
       convos.current.end_time = parseFloat($messages.attr('data-end-time'));
       convos.current.start_time = parseFloat($messages.attr('data-start-time'));
+      convos.current.last_read_time = parseFloat($messages.attr('data-last-read-time'));
       convos.current.nick = $messages.attr('data-nick') || '';
-      convos.current.state = $messages.attr('data-state') || 'disconnected';
       convos.current.network = $messages.attr('data-network') || 'convos';
+      convos.current.state = $messages.attr('data-state');
       convos.current.target = $messages.attr('data-target') || '';
       convos.send(convos.isChannel(convos.current.target) ? '/names' : ''); // get nick list or open socket
 
       $messages.find('li').attachEventsToMessage();
-      $doc.filter('form.sidebar').each(function() { $('form.sidebar ul').html($(this).find('ul:first').children()); });
+      $doc.filter('form.sidebar').each(function() {
+        $('form.sidebar').attr('action', this.action);
+        $('form.sidebar ul').html($(this).find('ul:first').children());
+      });
       $doc.filter('nav').each(function() { $('nav ul.conversations').html($(this).find('ul.conversations').children()); });
 
       if (location.href.indexOf('from=') > 0) {
@@ -194,11 +219,10 @@
       }
 
       if (!navigator.is_touch_device) focusFirst();
-      if (draw) convos.draw[draw](e);
       if (data) $('body').hideSidebar();
 
-      convos.at_bottom = true; // make convos.draw.ui scroll to bottom
-      convos.draw.ui(e);
+      convos.at_bottom = true; // make "resize" scroll to bottom
+      $(window).resize();
     });
   };
 
@@ -220,11 +244,16 @@
 
     if (navigator.is_ios) {
       $('input, textarea')
-        .on('click', function() { $('body').addClass('ios-input-focus'); $(window).scrollTo('bottom'); })
+        .on('click focus', function() { $('body').addClass('ios-input-focus'); $(window).scrollTo('bottom'); })
         .on('blur, focusout', function() { $('body').removeClass('ios-input-focus'); });
     }
 
-    $(window).on('resize', convos.draw.ui);
+    $(window).on('resize', function(e) {
+      var menu_width = 0;
+      $('nav .right').add('nav ul.conversations a').each(function() { menu_width += $(this).outerWidth(); });
+      $('nav a.conversations')[ menu_width > $('body').outerWidth() ? 'addClass' : 'removeClass' ]('overlapping');
+      if (convos.at_bottom) $(window).scrollTo('bottom');
+    };
 
     $(window).on('scroll', function(e) {
       convos.at_bottom = $(this).scrollTop() + $(this).height() > $('body').height() - convos.at_bottom_threshold;

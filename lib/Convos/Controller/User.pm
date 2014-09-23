@@ -36,6 +36,32 @@ sub auth {
   return 0;
 }
 
+=head2 delete
+
+Render a delete user confirmation page on GET and deletes the logged in
+user on POST.
+
+=cut
+
+sub delete {
+  my $self = shift;
+
+  if ($self->req->method ne 'POST') {
+    return $self->render(layout => 'tactile');
+  }
+
+  $self->delay(
+    sub {
+      my ($delay) = @_;
+      $self->app->core->delete_user({login => $self->session('login')}, $delay->begin);
+    },
+    sub {
+      my ($delay, $err) = @_;
+      $self->logout;
+    },
+  );
+}
+
 =head2 login
 
 Show the login form. Also responds to JSON requests with login status.
@@ -132,7 +158,6 @@ sub register {
 
       $self->logf(debug => '[reg] New user login=%s', $output->{login}) if DEBUG;
       $self->session(login => $output->{login});
-      $self->app->core->start_convos_conversation($output->{login});
       $self->redis->hmset(
         "user:$output->{login}" =>
           {digest => $self->_digest($output->{password}), email => $output->{email}, avatar => $output->{email}},

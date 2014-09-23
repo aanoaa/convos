@@ -1,14 +1,19 @@
-BEGIN { $ENV{MOJO_IRC_OFFLINE} = 1 }
+BEGIN {
+  $ENV{MOJO_IRC_OFFLINE} = 1;
+  use File::Temp qw/tempdir/;
+  $ENV{CONVOS_ARCHIVE_DIR} = tempdir;
+}
 use utf8;
 use t::Helper;
 use Mojo::JSON;
 use Mojo::DOM;
+use File::Spec::Functions 'catfile';
+use Time::Piece ();
 
-my $dom        = Mojo::DOM->new;
-my $server     = $t->app->redis->subscribe('convos:user:doe:magnet');
-my $connection = Convos::Core::Connection->new(name => 'magnet', login => 'doe');
+my $ts          = Time::Piece->new;
+my $channel_log = catfile $ENV{CONVOS_ARCHIVE_DIR}, qw( doe magnet ), '#mojo', $ts->strftime('%y/%m/%d.log');
+my $server_log  = catfile $ENV{CONVOS_ARCHIVE_DIR}, qw( doe magnet ), $ts->strftime('%y/%m/%d.log');
 
-$server->connect;
 
 redis_do(
   [hmset => 'user:doe', digest => 'E2G3goEIb8gpw', email => ''],
@@ -17,8 +22,8 @@ redis_do(
   [hmset => 'user:doe:connection:magnet', nick => 'doe'],
 );
 
-$connection->_irc->nick('doe');
-$connection->redis($t->app->redis);
+my $dom        = Mojo::DOM->new;
+my $connection = $t->app->core->ctrl_start(qw( doe magnet ));
 
 $t->post_ok('/login', form => {login => 'doe', password => 'barbar'})->status_is(302)
   ->header_is('Location', '/magnet/%23convos', 'Redirect to conversation');
@@ -31,12 +36,13 @@ $t->post_ok('/login', form => {login => 'doe', password => 'barbar'})->status_is
 }
 
 {
-  $t->websocket_ok('/socket');
+  $t->websocket_ok('/socket')->send_ok('PING')->message_ok->message_is('PONG');    # make sure we are subscribing
   $connection->_irc->from_irc_server(
     ":magnet.llarian.net 353 doe = #convos :fooman {special} \@woman +man [special]\r\n");
   $connection->_irc->from_irc_server(":magnet.llarian.net 366 doe #convos :End of /NAMES list.\r\n");
   $dom->parse($t->message_ok->message->[1]);
   ok $dom->at('li.nick-init[data-network="magnet"][data-target="#convos"]'), 'Got correct names for #convos';
+  like $dom, qr{\@woman.*\+man.*fooman}s, 'nicks are sorted';
   is $dom->at('a[href="cmd:///query fooman"][data-nick="fooman"]')->text,       'fooman',    'got fooman';
   is $dom->at('a[href="cmd:///query woman"][data-nick="woman"]')->text,         '@woman',    'got woman';
   is $dom->at('a[href="cmd:///query man"][data-nick="man"]')->text,             '+man',      'got man';
@@ -52,8 +58,9 @@ $t->post_ok('/login', form => {login => 'doe', password => 'barbar'})->status_is
     'Got correct li.message from fooman';
   is $dom->at('h3 a[href="/magnet/fooman"]')->text, 'fooman', 'got message from fooman';
   is $dom->at('.content a')->text, 'http://convos.by?a=1&b=2#yikes', 'http://convos.by#yikes';
-  is $dom->at('div.content'),
-    '<div class="content whitespace">doe: see this &amp;amp; link: <a href="http://convos.by?a=1&amp;b=2#yikes" target="_blank">http://convos.by?a=1&amp;b=2#yikes</a> # really cool</div>',
+  ok $dom->at('a.external[target="_blank"]'), 'got external link';
+  like $dom->at('div.content'),
+    qr{<div class="content whitespace">doe: see this &amp;amp; link: <a.*href="http://convos\.by\?a=1&amp;b=2\#yikes".*>http://convos\.by\?a=1&amp;b=2\#yikes</a> \# really cool</div>},
     'got link and amp';
   like $dom->at('.timestamp')->text, qr/^\d{1,2}:\d{1,2}$/, 'got timestamp';
 
@@ -264,5 +271,11 @@ $t->post_ok('/login', form => {login => 'doe', password => 'barbar'})->status_is
     '<a href="http://perl.org" target="_blank">http://perl.org</a> https://github.<a href="https://github.com/jhthorsen" target="_blank">https://github.com/jhthorsen</a> yay!';
 }
 
-done_testing;
+my $log = Mojo::Util::slurp($channel_log);
+is int scalar(() = $log =~ /\n/g), 10, 'lines in channel log file';
+like $log, qr{^\d+:\d+:\d+ :fooman\!user\@host http://convos\.by is really cool}m, 'log is really cool';
+$log = Mojo::Util::slurp($server_log);
+is int scalar(() = $log =~ /\n/g), 4, 'lines in server log file';
+like $log, qr{Your host is Tampa.FL.US.Undernet.org};
 
+done_testing;

@@ -1,12 +1,15 @@
 ;(function($) {
-  window.convos = window.convos || {}
+  window.convos = window.convos || {};
 
   var socket;
   var connect = function() {
-    var socket_url = $('body').attr('data-socket-url');
-    socket = new ReconnectingWebSocket({ url: socket_url, ping_protocol: [ 'PING', 'PONG' ] });
+    var socketUrl = $('body').attr('data-socket-url');
+    socket = new ReconnectingWebSocket({ url: socketUrl, ping_protocol: [ 'PING', 'PONG' ] });
     socket.onmessage = receiveMessage;
     socket.onpong = enableInput;
+    socket.ontimeout = function() {
+      convos.makeMessage('I am unable to connect to Convos. Maybe you have lost connection to internet or there is a proxy blocking WebSockets? <a href="" class="button">Reconnect</a>').addClass('error').addToMessages();
+    };
     socket.onclose = function() { convos.input.addClass('disabled'); };
     socket.onopen = function(e) {
       enableInput();
@@ -19,13 +22,20 @@
   var addPendingMessage = function(message, attr) {
     var $pending = $('<li><h3>' + convos.current.nick + '</h3><div class="content">' + message + '</div></li>').attr(attr);
     $pending.addClass('message pending').data('sender', convos.current.nick).addToMessages();
-    setTimeout(function() { messageFailed(attr['id']); }, 10000);
+    setTimeout(function() { messageFailed(attr.id); }, 10000);
     if (convos.at_bottom) $(window).scrollTo('bottom');
   };
 
   var enableInput = function() {
-    convos.input.attr('placeholder', 'What\'s on your mind ' + convos.current.nick + '?');
+    idleTimer();
+    convos.input.attr('placeholder', 'What is on your mind, ' + convos.current.nick + '?');
     convos.input.removeClass('disabled');
+  };
+
+  var idleTimer = function() {
+    if (idleTimer.t) clearTimeout(idleTimer.t);
+    if (!convos.current.target) convos.getNewerMessages(); // make sure we have the newest server messages on register
+    idleTimer.t = setTimeout(function() { convos.emit('idle') }, 1500);
   };
 
   var messageFailed = function(id, description) {
@@ -64,8 +74,10 @@
 
   var receiveMessage = function(e) {
     var $message = $(e.data);
-    var action = $message.attr('class').match(/^(nick|conversation)-(\w+)/);
+    var event_name = $message.attr('data-event') || 'message';
+    var event_args = $message.attr('data-args');
 
+    idleTimer();
     toCurrent($message);
 
     if ($message.hasClass('error')) {
@@ -76,36 +88,49 @@
     }
 
     if ($message.hasClass('highlight')) receiveHighlightMessage($message);
-    if (action && convos[action[1] + 's']) convos[action[1] + 's'][action[2]]($message);
+
+    // could change "to_current"
+    convos.emit.apply(this, [event_name].concat(event_args ? $.parseJSON($('<textarea />').html(event_args).text()) : [$message]));
 
     if ($message.data('to_current')) {
+      if ($message.attr('data-state')) convos.current.state = $message.attr('data-state');
       $message.addToMessages();
     }
     else if ($message.hasClass('message')) {
-      var url = $.url_for($message.attr('data-network'), encodeURIComponent($message.attr('data-target')));
-      var $unread = $('nav ul.conversations').find('a[href="' + url + '"]').children('b');
-      $unread.text(parseInt($unread.html() || 0) + 1);
+      receiveOtherMessage($message);
     }
 
     if (convos.at_bottom) $(window).scrollTo('bottom');
   };
 
+  var receiveOtherMessage = function($message) {
+    var url = $.url_for($message.attr('data-network'), encodeURIComponent($message.attr('data-target')));
+    var $a = $('nav ul.conversations').find('a[href="' + url + '"]');
+    var $unread = $a.children('b');
+    var n = parseInt($unread.html() || 0) + 1;
+    $unread.text(n > 99 ? '99+' : n);
+    if ($message.hasClass('highlight')) $a.addClass('mention');
+  };
+
   var toCurrent = function($e) {
     if ($e.data('network') == convos.current.network && $e.data('target') == convos.current.target) $e.data('to_current', true);
-    if ($e.data('network') == convos.current.network && $e.data('target') == '') $e.data('to_current', true);
-    if ($e.data('network') == '' && $e.data('target') == '') $e.data('to_current', true);
+    if ($e.data('network') == convos.current.network && $e.data('target') === '') $e.data('to_current', true);
+    if ($e.data('network') === '' && $e.data('target') === '') $e.data('to_current', true);
   };
 
   convos.send = function(message, attr) {
     if (!socket) connect();
-    if (message.length == 0) return socket.send('PING');
+    if (message.length === 0) return socket.send('PING');
 
     attr = attr || {};
-    attr['class'] = message.match('^\/') ? 'hidden' : '';
-    attr['id'] = window.guid();
+    attr.class = message.match('^\/') ? 'hidden' : '';
+    attr.id = window.guid();
     $.each(['network', 'state', 'target'], function(i) { attr["data-" + this] = attr["data-" + this] || convos.current[this]; });
+    var encodedMsg = message.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
+        return '&#' + i.charCodeAt(0) + ';';
+    });
 
-    socket.send($('<div/>').attr(attr).text(message).prop('outerHTML'));
+    socket.send($('<div/>').attr(attr).text(encodedMsg).prop('outerHTML'));
     if (attr['data-history']) convos.addInputHistory(message);
     if (!message.match(/^\//)) addPendingMessage(message, attr);
   };

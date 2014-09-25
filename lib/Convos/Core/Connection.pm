@@ -58,6 +58,7 @@ use Convos::Core::Util qw( as_id id_as );
 use Sys::Hostname ();
 use constant CHANNEL_LIST_CACHE_TIMEOUT => 3600;    # TODO: Figure out how long to cache channel list
 use constant DEBUG => $ENV{CONVOS_DEBUG} ? 1 : 0;
+use constant KEEP_TIME => $ENV{CONVOS_KEEP_TIME} || 604000;
 
 =head1 ATTRIBUTES
 
@@ -418,15 +419,23 @@ sub _add_conversation {
   Mojo::IOLoop->delay(
     sub {
       my ($delay) = @_;
+
+      # Return current position or add to set with 0 score
       $self->redis->zincrby($self->{conversation_path}, 0, $name, $delay->begin);
     },
     sub {
       my ($delay, $part_of_conversation_list) = @_;
+
+      # Already in set
       $part_of_conversation_list and return;
+
+      # Fetch position of current conversation
       $self->redis->zrevrange($self->{conversation_path}, 0, 0, 'WITHSCORES', $delay->begin);
     },
     sub {
       my ($delay, $score) = @_;
+
+      # Move new conversation to 2. position in list
       $self->redis->zadd($self->{conversation_path}, $score->[1] - 0.0001, $name, $delay->begin);
     },
     sub {
@@ -1038,6 +1047,36 @@ sub DESTROY {
   my $ioloop       = $self->{_irc}{ioloop} or return;
   my $keepnick_tid = $self->{keepnick_tid} or return;
   $ioloop->remove($keepnick_tid);
+}
+
+=head2 flush_old_messages
+
+Remove older messages from redis connection
+
+=cut
+
+sub flush_old_messages {
+  my ($self, $cb) = @_;
+  my $limit = time - KEEP_TIME;
+
+  Scalar::Util::weaken($self);
+  $self->redis->zrange(
+    $self->{conversation_path},
+    0, -1,
+    sub {
+      my ($redis, $conversations) = @_;
+      for my $conv (@$conversations) {
+        my $id = (id_as $conv)[1];
+        $self->redis->zremrangebyscore(
+          "$self->{path}:$id:msg",
+          0, $limit,
+          sub {
+            $cb->() if $cb;
+          }
+        );
+      }
+    }
+  );
 }
 
 =head1 COPYRIGHT

@@ -47,6 +47,7 @@ Holds a L<Mojo::Redis> object.
 has archive => sub { require Convos::Archive::File; Convos::Archive::File->new; };
 has log     => sub { Mojo::Log->new };
 has redis   => sub { die 'redis connection required in constructor' };
+has 'cleanup';
 
 =head1 METHODS
 
@@ -130,6 +131,7 @@ sub start {
   );
 
   $self->_start_control_channel;
+  $self->_start_cleanup;
   $self;
 }
 
@@ -171,6 +173,31 @@ sub _start_control_channel {
       Mojo::IOLoop->timer(0.5, sub { $self and $self->_start_control_channel });
     },
   );
+}
+
+sub _start_cleanup {
+  my $self = shift;
+  Scalar::Util::weaken($self);
+  $self->cleanup(
+    Mojo::IOLoop->recurring(
+      43200 => sub {
+        $self->cleanup_connections;
+      }
+    )
+  );
+}
+
+=head2 cleanup_connections 
+
+Run maintainance on active connections
+
+=cut
+
+sub cleanup_connections {
+  my $self = shift;
+  for my $connection (keys @{$self->{connections}}) {
+    $self->{connections}->{$connection}->flush_old_messages;
+  }
 }
 
 =head2 add_connection

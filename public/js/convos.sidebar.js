@@ -27,8 +27,7 @@
 
       if ($a.hasClass('active')) {
         $a.removeClass('active');
-        if (!showing) $togglers.filter('.keep-open').addClass('active');
-        if (!$a.hasClass('keep-open')) $t.removeClass('active');
+        $t.removeClass('active');
         if (!$togglers.filter('.active').length && !navigator.is_touch_device) convos.input.focus();
         return false;
       }
@@ -36,7 +35,7 @@
       showing = true;
       $togglers.filter('.active').trigger('tap');
       $t.addClass('active').trigger('show');
-      $a.addClass('active');
+      $a.addClass('active').closest('nav').addClass('active');
       showing = false;
 
       if (!navigator.is_touch_device) {
@@ -45,14 +44,5 @@
     });
 
     $(window).resize();
-  });
-
-  $(window).on('resize', function() {
-    if ($(document).width() < convos.responsiveWidth) {
-      if ($main.hasClass('keep-open')) $main.removeClass('keep-open').trigger('tap');
-    }
-    else {
-      if (!$main.hasClass('keep-open')) $main.addClass('keep-open').trigger('tap');
-    }
   });
 })(jQuery);

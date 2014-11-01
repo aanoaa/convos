@@ -4,7 +4,9 @@
     <li class="<%= $n->{read} ? '' : 'unread' %>">
       %= link_to url_for(view => %$n)->query(notification => $n->{index}, from => $n->{timestamp}), title => "View conversation with $n->{target}", begin
         <b><%= $n->{nick} %></b>
-        <%= "in $n->{target}" if $n->{is_channel} %>
+      % if ($n->{is_channel}) {
+        <i><%= "in $n->{target}" %></i>
+      % }
         <span class="message"><%= $n->{message} %></span>
       % end
     </li>

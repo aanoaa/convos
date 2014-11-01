@@ -12,16 +12,32 @@
   % }
   </head>
   <body class="chat" data-want-desktop-notifications="<%= session('desktop_notifications') // 1 %>" data-socket-url="<%= url_for('socket')->to_abs %>">
-    %= include 'partials/nav'
-    %= include 'partials/desktop-notifications-question'
+    <nav class="chat">
+      <div class="items">
+        %= link_to 'index', title => 'Status messages and settings', begin
+          %= image '/image/icon-navbar.png', alt => 'Convos'
+        % end
+        <a href="sidebar://form.goto-anything" title="Goto anything" class="goto-anything btn-sidebar">
+          %= fa 'bars'
+        </a>
+        <a href="sidebar://div.notification-list" title="Show notifications" class="mention notifications btn-sidebar">
+          %= fa 'bell-o'
+          <b><%= $n_notifications > 999 ? '999+' : $n_notifications || '' %></b>
+        </a>
+        <a href="sidebar://form.sidebar" title="Conversation settings" class="sidebar btn-sidebar">
+          %= fa 'cog'
+        </a>
+      </div>
 
-    %= form_for 'connection.control', { name => $network }, method => 'post', class => "sidebar sidebar-right", begin
-      <ul>
-        %= include "sidebar/$sidebar"
-      </ul>
-    % end
+      %= include "sidebar/goto_anything"
+      %= include 'sidebar/notification_list' if stash 'notification_list'
 
-    %= include "sidebar/goto_anything"
+      %= form_for 'connection.control', { name => $network }, method => 'post', class => "sidebar sidebar-right", begin
+        <ul>
+          %= include "sidebar/$sidebar"
+        </ul>
+      % end
+    </nav>
 
     <div class="messages">
       %= content
@@ -32,6 +48,5 @@
       %= text_field 'irc_cmd', placeholder => "Connecting to backend...", autocomplete => 'off', class => 'disabled', disabled => 'disabled'
     % end
 
-    %= include 'sidebar/notification_list' if stash 'notification_list'
   </body>
 </html>

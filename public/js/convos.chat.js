@@ -91,6 +91,7 @@
   };
 
   var firstTimeConnected = convos.on('idle', function() {
+    return; // TODO: NEW LAYOUT
     if ($('nav ul.conversations a[data-network="' + convos.current.network + '"]').length) return convos.unsubscribe('idle', firstTimeConnected);
     if (convos.current.state != 'connected') return;
     convos.unsubscribe('idle', firstTimeConnected);

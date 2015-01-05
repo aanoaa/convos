@@ -243,10 +243,10 @@ sub startup {
 sub _assets {
   my $self = shift;
 
-  $self->plugin('AssetPack');
+  $self->plugin('Browserify' => {browserify_args => [-g => "reactify"], extensions => ['js']});
   $self->plugin('FontAwesome4', css => []);
   $self->asset('c.css' => qw( /scss/font-awesome.scss /sass/convos.scss ));
-  $self->asset('c.js'  => qw( https://platform.twitter.com/widgets.js ));
+  $self->asset('c.js'  => qw( https://platform.twitter.com/widgets.js /js/main.js ));
 }
 
 sub _before_dispatch {

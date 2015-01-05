@@ -75,3 +75,4 @@
 ^\.travis.yml
 \.sass-cache
 ^irc_logs
+^node_modules

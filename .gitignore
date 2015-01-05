@@ -22,4 +22,5 @@ MANIFEST*
 /script/toadfarm.pid
 /public/packed
 /irc_logs*
+/node_modules
 Convos-*.gz

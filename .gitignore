@@ -12,8 +12,7 @@ Makefile*
 MANIFEST*
 !MANIFEST.SKIP
 *META.*
-/lib/Convos/public
-/lib/Convos/templates
+/lib/Convos/public/packed
 /local
 /log
 /script/hypnotoad.pid

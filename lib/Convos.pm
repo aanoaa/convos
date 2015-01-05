@@ -187,10 +187,15 @@ This method will run once at server start
 
 sub startup {
   my $self = shift;
+  my $home = catdir dirname(__FILE__), 'Convos';
   my $config;
 
   $self->{convos_executable_path} = $0;    # required to work from within toadfarm
-  $self->_from_cpan;
+
+  $self->home->parse($home);
+  $self->static->paths->[0]   = $self->home->rel_dir('public');
+  $self->renderer->paths->[0] = $self->home->rel_dir('templates');
+
   $config = $self->_config;
 
   if (my $log = $config->{log}) {
@@ -241,27 +246,7 @@ sub _assets {
   $self->plugin('AssetPack');
   $self->plugin('FontAwesome4', css => []);
   $self->asset('c.css' => qw( /scss/font-awesome.scss /sass/convos.scss ));
-  $self->asset(
-    'c.js' => qw(
-      https://platform.twitter.com/widgets.js
-      /js/globals.js
-      /js/jquery.js
-      /js/ws-reconnecting.js
-      /js/jquery.hotkeys.js
-      /js/jquery.finger.js
-      /js/jquery.pjax.js
-      /js/jquery.notify.js
-      /js/jquery.disableouterscroll.js
-      /js/convos.events.js
-      /js/convos.sidebar.js
-      /js/convos.socket.js
-      /js/convos.input.js
-      /js/convos.conversations.js
-      /js/convos.nicks.js
-      /js/convos.goto-anything.js
-      /js/convos.chat.js
-      )
-  );
+  $self->asset('c.js'  => qw( https://platform.twitter.com/widgets.js ));
 }
 
 sub _before_dispatch {
@@ -309,16 +294,6 @@ sub _embed_backend {
     $self->log->info('Starting convos backend.');
     $self->core->start;
   }
-}
-
-sub _from_cpan {
-  my $self = shift;
-  my $home = catdir dirname(__FILE__), 'Convos';
-
-  return if -d $self->home->rel_dir('templates');
-  $self->home->parse($home);
-  $self->static->paths->[0]   = $self->home->rel_dir('public');
-  $self->renderer->paths->[0] = $self->home->rel_dir('templates');
 }
 
 sub _private_routes {

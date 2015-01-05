@@ -327,7 +327,7 @@ sub _public_routes {
   my $self = shift;
   my $r = $self->routes->any->to(layout => 'tactile');
 
-  $r->get('/')->to('client#route')->name('index');
+  $r->get('/')->to(template => 'app', layout => undef);
   $r->get('/convos')->to(cb => sub { shift->redirect_to('index'); });
   $r->get('/avatar')->to('user#avatar')->name('avatar');
   $r->get('/login')->to('user#login')->name('login');

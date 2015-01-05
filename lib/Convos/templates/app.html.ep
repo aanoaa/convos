@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= $organization_name %> - <%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0<%= stash('minimal_ui') ? '; minimal-ui' : '' %>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="meta-apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="shortcut icon" sizes="196x196" href="<%= url_for('/image/icon-196.png') %>">
+    <link rel="shortcut icon" sizes="128x128" href="<%= url_for('/image/icon-128.png') %>">
+    <link rel="apple-touch-icon" sizes="128x128" href="<%= url_for('/image/icon-128.png') %>">
+    <link rel="apple-touch-icon-precomposed" sizes="128x128" href="<%= url_for('/image/icon-128.png') %>">
+    %= asset 'c.css'
+  </head>
+  <body>
+    <div id="app">Loading convos...</div>
+    %= javascript begin
+    window.url_for=function(path){return [path,'<%= $self->url_for('/') %>'].join('/').replace(/\/+/g, '/').replace(/#/g, '%23');};
+    % end
+    %= asset 'c.js'
+  </body>
+</html>

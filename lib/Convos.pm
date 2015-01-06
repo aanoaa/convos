@@ -187,14 +187,10 @@ This method will run once at server start
 
 sub startup {
   my $self = shift;
-  my $home = catdir dirname(__FILE__), 'Convos';
   my $config;
 
+  $self->_cpan_home;
   $self->{convos_executable_path} = $0;    # required to work from within toadfarm
-
-  $self->home->parse($home);
-  $self->static->paths->[0]   = $self->home->rel_dir('public');
-  $self->renderer->paths->[0] = $self->home->rel_dir('templates');
 
   $config = $self->_config;
 
@@ -273,6 +269,17 @@ sub _config {
   $config->{name}                = $ENV{CONVOS_ORGANIZATION_NAME} if $ENV{CONVOS_ORGANIZATION_NAME};
   $config->{name} ||= 'Nordaaker';
   $config;
+}
+
+sub _cpan_home {
+  my $self = shift;
+  my $home = catdir dirname(__FILE__), 'Convos';
+
+  if (-d catdir $home, 'public') {
+    $self->home->parse($home);
+    $self->static->paths->[0]   = $self->home->rel_dir('public');
+    $self->renderer->paths->[0] = $self->home->rel_dir('templates');
+  }
 }
 
 sub _embed_backend {

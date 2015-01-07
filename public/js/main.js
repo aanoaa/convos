@@ -1,5 +1,6 @@
-var React = require('react');
+var React = require('react/addons');
 var Router = require('react-router');
+var injectTapEventPlugin = require('react-tap-event-plugin');
 var Storage = require('./component/storage');
 
 var Route = Router.Route;
@@ -15,10 +16,13 @@ var routes = (
   </Route>
 );
 
+// Can go away when react 1.0 release
+injectTapEventPlugin();
+
 Router.run(
   routes,
   Router.HistoryLocation,
   function(Handler, state) {
-    React.render(<Handler/>, document.getElementById('app'));
+    React.render(<Handler/>, document.body);
   }
 );

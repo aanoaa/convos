@@ -12,7 +12,7 @@
     %= asset 'c.css'
   </head>
   <body>
-    <div id="app">Loading convos...</div>
+    Loading Convos...
     %= javascript begin
     window.url_for=function(path){return [path,'<%= $self->url_for('/') %>'].join('/').replace(/\/+/g, '/').replace(/#/g, '%23');};
     % end

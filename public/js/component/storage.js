@@ -30,6 +30,10 @@ module.exports.clear = function(name) {
   return value;
 };
 
+module.exports.set = function(name, value) {
+  accessor[name](value);
+};
+
 // mixin({ stateName: "accessorName", ... });
 module.exports.mixin = function(state2accessor) {
   var accessor2state = {};

@@ -1,4 +1,4 @@
-var Storage = require('./storage');
+var Storage = require('../mixins/storage');
 var wasWideScreen = false;
 
 var isWideScreen = function() {

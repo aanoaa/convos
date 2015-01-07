@@ -1,7 +1,8 @@
 var React = require('react/addons');
 var Router = require('react-router');
 var injectTapEventPlugin = require('react-tap-event-plugin');
-var Storage = require('./component/storage');
+var Storage = require('./mixins/storage');
+var onResize = require('./utils/onresize');
 
 var Route = Router.Route;
 var DefaultRoute = Router.DefaultRoute;
@@ -10,7 +11,7 @@ Storage.attr('nNotifications', function() { return 0; });
 Storage.attr('activeSidebar', function() { return ''; });
 
 var routes = (
-  <Route name="index" path="/" handler={require('./component/app')}>
+  <Route name="index" path="/" handler={require('./layouts/chat')}>
     <Route name="conversation" path=":connection_id/:conversation_id" handler={require('./controller/conversation')}/>
     <DefaultRoute handler={require('./controller/index')}/>
   </Route>

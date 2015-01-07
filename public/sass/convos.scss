@@ -7,5 +7,41 @@
 @import "page-with-nav";
 @import "loader";
 
+.mui-app-bar {
+  .right { float: right; }
+}
+
+.mui-left-nav {
+  .app-bar-logo {
+    cursor: pointer;
+    @extend .mui-font-style-headline;
+    @extend .mui-text-full-white;
+    line-height: $app-bar-height;
+    @extend .mui-font-weight-light;
+    background-color: $primary-1-color;
+    padding-left: $desktop-gutter;
+    padding-top: 0;
+    margin-bottom: $desktop-gutter-mini;
+  }
+}
+
+.right-nav {
+  width: 200px;
+  position: fixed;
+  top: 6px;
+  bottom: 30px;
+  right: 40px;
+  z-index: 10;
+
+  &.hidden { left: -1000px; }
+
+  @media #{$device-medium} {
+    top: $app-bar-height;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+  }
+}
+
 // @import "gist";
 // @import "link-embedder";

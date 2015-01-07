@@ -1,0 +1,3 @@
+[submodule "vendor/material-ui-sass"]
+	path = vendor/material-ui-sass
+	url = https://github.com/gpbl/material-ui-sass.git

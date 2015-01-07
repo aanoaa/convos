@@ -17,3 +17,10 @@
   filter: alpha(opacity= $value * 100 );
   zoom: 1;
 }
+
+@mixin keyframes($name) {
+  @-webkit-keyframes #{$name} { @content; }
+  @-moz-keyframes #{$name} { @content; }
+  @-ms-keyframes #{$name} { @content; }
+  @keyframes #{$name} { @content; }
+}

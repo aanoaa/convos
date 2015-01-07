@@ -12,7 +12,19 @@
     %= asset 'c.css'
   </head>
   <body>
-    Loading Convos...
+    <div class="react-has-not-loaded">
+      <h2>Convos is loading...</h2>
+      <div class="load-bar"><div class="red"></div><div class="blue"></div><div class="yellow"></div></div>
+      <p>
+        You might not have a supported browser.
+        Try <%= link_to 'Chrome', 'http://www.google.com/chrome/' %>
+        or <%= link_to 'Firefox', 'http://getfirefox.com' %>
+        if this message does not disappear soon.
+      </p>
+      <p>
+        &copy; <a href="http://nordaaker.com">Nordaaker</a> - <a href="http://convos.by">About</a>
+      </p>
+    </div>
     %= javascript begin
     window.url_for=function(path){return [path,'<%= $self->url_for('/') %>'].join('/').replace(/\/+/g, '/').replace(/#/g, '%23');};
     % end

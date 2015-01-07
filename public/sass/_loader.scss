@@ -1,0 +1,42 @@
+.load-bar {
+  position: relative;
+  margin: $desktop-gutter 0;
+  width: 100%;
+  height: 6px;
+  background-color: #fdba2c;
+
+  .red, .blue, .yellow {
+    content: "";
+    position: absolute;
+    width: 0%;
+    height: 100%;
+    left: 50%;
+    text-align: center;
+  }
+  .red:nth-child(1) {
+    background-color: #da4733;
+    @include prefix(animation, loading 3s linear infinite);
+  }
+  .blue:nth-child(2) {
+    background-color: #3b78e7;
+    @include prefix(animation, loading 3s linear 1s infinite);
+  }
+  .yellow:nth-child(3) {
+    background-color: #fdba2c;
+    @include prefix(animation, loading 3s linear 2s infinite);
+  }
+}
+
+.react-has-not-loaded {
+  font-family: $contentFontFamily;
+  padding: 3em;
+  font-size: 20px;
+  &, a { color: $body-text-color; }
+  p { margin: 10px 0; font-size: 12px; }
+}
+
+@include keyframes(loading) {
+  from { left: 50%; width: 0; z-index:100; }
+  33.3333% { left: 0; width: 100%; z-index: 10; }
+  to { left: 0; width: 100%; }
+}

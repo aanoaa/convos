@@ -237,12 +237,25 @@ sub startup {
 }
 
 sub _assets {
-  my $self = shift;
+  my $self     = shift;
+  my $aliasify = $self->home->rel_file('public/js/aliasify.js');
 
-  $self->plugin('Browserify' => {browserify_args => [-g => "reactify"], extensions => ['js']});
+  $self->plugin('AssetPack');
   $self->plugin('FontAwesome4', css => []);
+
+  $self->asset->preprocessor(
+    Browserify => {
+      browserify_args => [-g             => $aliasify, -g => 'reactify'],
+      bundle_modules  => {'react/addons' => ['react-tap-event-plugin']},
+      ignore_modules  => ['react'],
+      environment     => $self->mode,
+      extensions      => [qw( js jsx )]
+    }
+  );
+
+  $ENV{SASS_PATH} = $self->home->rel_dir('vendor/material-ui-sass/');
   $self->asset('c.css' => qw( /scss/font-awesome.scss /sass/convos.scss ));
-  $self->asset('c.js'  => qw( https://platform.twitter.com/widgets.js /js/main.js ));
+  $self->asset('c.js' => qw( /js/main.js ));    # skip for now: https://platform.twitter.com/widgets.js
 }
 
 sub _before_dispatch {

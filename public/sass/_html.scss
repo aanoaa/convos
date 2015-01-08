@@ -5,12 +5,12 @@ html {
   -webkit-font-smoothing: antialiased;
   color: $body-text-color;
   font-family: $contentFontFamily;
-  background-color: $canvas-color;
+  background: #ececec; // either this or canvas-color
+  background: $canvas-color;
 }
 
 body {
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 13px;
 }
 
 hr {
@@ -29,4 +29,3 @@ hr {
   margin-top: 0;
   margin-bottom: 18px;
 }
-

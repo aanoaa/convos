@@ -1,18 +1,21 @@
 var React = require('react');
 var Router = require('react-router');
-var mui = require('material-ui');
 var Storage = require('../mixins/storage');
+var mui = require('material-ui');
 
 var Menu = mui.Menu;
+
+Storage.attr('rightNavOpen', function() { return false; }, true);
 
 module.exports = React.createClass({
   mixins: [
     Router.Navigation,
     require('../mixins/click-awayable'),
-    Storage.mixin({ docked: 'wideScreen' })
+    Storage.mixin({ open: 'rightNavOpen', docked: 'wideScreen' })
   ],
   componentClickAway: function(e) {
     if ((e.target.parentNode.className || '').indexOf('activate-right-nav') >= 0) return;
+    if (this.state.docked) return;
     if (this.state.open) this.open(false);
     e.preventDefault();
   },
@@ -21,9 +24,7 @@ module.exports = React.createClass({
   },
   getInitialState: function() {
     return {
-      open: false,
       menuItems: [
-        { text: "", icon: "social-group" },
         { text: "jberger", route: "conversation" },
         { text: "batman", route: "conversation" },
         { text: "marcus", route: "conversation" },
@@ -33,15 +34,19 @@ module.exports = React.createClass({
     };
   },
   open: function(state) {
-    if (arguments.length) return this.setState({ open: state });
-    return this.setState({ open: !this.state.open });
+    if (arguments.length) return this.store('open', state);
+    return this.store('open', !this.state.open);
   },
   render: function() {
+    var docked = this.state.docked && this.state.open;
+
+    document.body.classList[docked ? "add" : "remove"]("got-right-sidebar");
+
     return (
       <Menu
-        className="right-nav"
-        hideable={!this.state.docked}
-        visible={this.state.docked || this.state.open}
+        className="right-nav scrollable"
+        hideable={true}
+        visible={this.state.open}
         menuItems={this.state.menuItems}
         onItemClick={this.onSelect}
       />

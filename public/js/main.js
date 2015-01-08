@@ -13,7 +13,7 @@ Storage.attr('activeSidebar', function() { return ''; });
 var routes = (
   <Route name="index" path="/" handler={require('./layouts/chat')}>
     <Route name="conversation" path=":connection_id/:conversation_id" handler={require('./controller/conversation')}/>
-    <DefaultRoute handler={require('./controller/index')}/>
+    <DefaultRoute handler={require('./controller/conversation')}/>
   </Route>
 );
 

@@ -7,6 +7,19 @@
 @import "html";
 @import "page-with-nav";
 @import "loader";
+@import "messages";
+
+.content-wrapper {
+  background-color: $canvas-color;
+  margin: 0 auto;
+  max-width: $device-large-width;
+}
+
+body.got-right-sidebar {
+  .content-wrapper {
+    margin-left: $desktop-gutter-mini;
+  }
+}
 
 .mui-app-bar {
   .right { float: right; }
@@ -27,20 +40,21 @@
 }
 
 .mui-menu.right-nav {
-  width: 200px;
+  width: 240px;
   position: fixed;
-  top: 6px;
-  right: 40px;
-  z-index: 10;
+  top: $app-bar-height;
+  right: 0;
+  bottom: 0;
+  height: auto !important;
 
-  @media #{$device-large} {
-    top: $app-bar-height;
-    height: auto !important;
-    bottom: 0;
-    right: 0;
-    z-index: 1;
+  .mui-paper-container {
+    padding-bottom: $desktop-gutter-mini;
   }
 }
+
+// add scrollbar to selected items
+.scrollable.mui-left-nav .mui-menu .mui-paper-container { overflow-y: auto !important; }
+.scrollable.mui-menu .mui-paper-container { overflow-y: auto !important; }
 
 // @import "gist";
 // @import "link-embedder";

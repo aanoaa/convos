@@ -1,0 +1,44 @@
+ul.message-list {
+  margin-top: 10px;
+
+  li {
+    list-style: none;
+    overflow: hidden;
+    clear: left;
+  }
+
+  button.mui-icon-button, .content { float: left; }
+  button.mui-icon-button { padding-left: 0; }
+
+  h4 {
+    @extend .mui-font-style-subhead-1;
+    margin-bottom: 0;
+  }
+
+  .timestamp {
+    @extend .mui-font-style-body-1;
+    margin-bottom: 0;
+    padding: 3px $desktop-gutter-mini 0 0;
+    float: right;
+  }
+}
+
+.message-input-wrapper {
+  button.mui-icon-button {
+    color: #79c;
+    padding-top: 0;
+    padding-left: 0;
+    float: left;
+  }
+
+  .mui-input {
+    margin-left: $desktop-gutter-more;
+    margin-right: $desktop-gutter-mini;
+    overflow: hidden;
+  }
+
+  .mui-input .mui-input-bar,
+  .mui-input input[type="text"] {
+    width: 100%;
+  }
+}

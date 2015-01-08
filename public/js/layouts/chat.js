@@ -17,16 +17,14 @@ module.exports = React.createClass({
   toggleNotifications: function(e) {
     alert("notifications");
   },
+  toggleSearch: function(e) {
+    alert("search");
+  },
   toggleRightMenu: function(e) {
     this.refs.rightNav.open();
   },
   render: function() {
-    var title = "#mojo - 🐯 hear me roar";
-    var icons = [<IconButton icon="social-notifications" onTouchTap={this.toggleNotifications} />];
-
-    if (!this.state.wideScreen) {
-      icons.push(<IconButton className="activate-right-nav" icon="navigation-more-vert" onTouchTap={this.toggleRightMenu} />);
-    }
+    var title = "#mojo";
 
     return (
       <AppCanvas predefinedLayout={1}>
@@ -36,11 +34,19 @@ module.exports = React.createClass({
         title={title}
         zDepth={0}
         >
-          <div className="right">{icons}</div>
+          <div className="right">
+            <IconButton icon="action-search" onTouchTap={this.toggleSearch} />
+            <IconButton icon="social-notifications" onTouchTap={this.toggleNotifications} />
+            <IconButton className="activate-right-nav" icon="navigation-more-vert" onTouchTap={this.toggleRightMenu} />
+          </div>
         </AppBar>
+
+        <div className="mui-app-content-canvas">
+          <RouteHandler />
+        </div>
+
         <LeftNav ref="leftNav" />
         <RightNav ref="rightNav" />
-        <RouteHandler/>
       </AppCanvas>
     );
   }

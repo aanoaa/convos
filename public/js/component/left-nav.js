@@ -65,6 +65,7 @@ module.exports = React.createClass({
 
     return (
       <LeftNav
+        className="scrollable"
         docked={docked && this.state.open}
         header={header}
         isInitiallyOpen={false}

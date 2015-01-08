@@ -7,7 +7,7 @@ var isWideScreen = function() {
 
 window.addEventListener('resize', function(e) {
   if (isWideScreen() == wasWideScreen) return;
-  Storage.set('wideScreen', (wasWideScreen = !wasWideScreen));
+  Storage.store('wideScreen', (wasWideScreen = !wasWideScreen));
 });
 
 wasWideScreen = isWideScreen();

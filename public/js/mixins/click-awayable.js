@@ -17,8 +17,10 @@ module.exports = {
   },
   _bindClickAway: function() {
     Events.on(document, 'click', this._checkClickAway);
+    Events.on(document, 'touchstart', this._checkClickAway);
   },
   _unbindClickAway: function() {
     Events.off(document, 'click', this._checkClickAway);
+    Events.off(document, 'touchstart', this._checkClickAway);
   }
 };

@@ -12,7 +12,7 @@
 }
 
 .mui-left-nav {
-  .app-bar-logo {
+  h1 {
     cursor: pointer;
     @extend .mui-font-style-headline;
     @extend .mui-text-full-white;
@@ -25,18 +25,16 @@
   }
 }
 
-.right-nav {
+.mui-menu.right-nav {
   width: 200px;
   position: fixed;
   top: 6px;
-  bottom: 30px;
   right: 40px;
   z-index: 10;
 
-  &.hidden { left: -1000px; }
-
-  @media #{$device-medium} {
+  @media #{$device-large} {
     top: $app-bar-height;
+    height: auto !important;
     bottom: 0;
     right: 0;
     z-index: 1;

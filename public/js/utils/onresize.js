@@ -2,7 +2,7 @@ var Storage = require('../mixins/storage');
 var wasWideScreen = false;
 
 var isWideScreen = function() {
-  return window.innerWidth > 1024;
+  return window.innerWidth > 992; // $device-large from sass
 };
 
 window.addEventListener('resize', function(e) {

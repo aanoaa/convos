@@ -12,17 +12,18 @@ module.exports = React.createClass({
     Storage.mixin({ docked: 'wideScreen' })
   ],
   componentClickAway: function(e) {
-    if ((e.target.className || '').indexOf('activate-right-nav') >= 0) return;
+    if ((e.target.parentNode.className || '').indexOf('activate-right-nav') >= 0) return;
     if (this.state.open) this.open(false);
     e.preventDefault();
   },
-  onChange: function(e, i, payload) {
+  onSelect: function(e, i, payload) {
     console.log(payload);
   },
   getInitialState: function() {
     return {
       open: false,
       menuItems: [
+        { text: "", icon: "social-group" },
         { text: "jberger", route: "conversation" },
         { text: "batman", route: "conversation" },
         { text: "marcus", route: "conversation" },
@@ -36,12 +37,13 @@ module.exports = React.createClass({
     return this.setState({ open: !this.state.open });
   },
   render: function() {
-    var visible = this.state.docked || this.state.open;
-
     return (
       <Menu
-        className={"right-nav " + (visible ? "visible" : "hidden")}
+        className="right-nav"
+        hideable={!this.state.docked}
+        visible={this.state.docked || this.state.open}
         menuItems={this.state.menuItems}
+        onItemClick={this.onSelect}
       />
     );
   }

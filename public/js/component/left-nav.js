@@ -61,7 +61,7 @@ module.exports = React.createClass({
   },
   render: function() {
     var docked = this.state.docked;
-    var header = (<div className="app-bar-logo" onTouchTap={this.open}>Convos</div>);
+    var header = (<h1 onTouchTap={this.open}>Convos</h1>);
 
     return (
       <LeftNav

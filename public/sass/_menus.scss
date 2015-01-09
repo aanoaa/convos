@@ -21,9 +21,11 @@
   position: fixed;
   top: $app-bar-height;
   right: 0;
-  height: auto !important;
 
-  &.mui-visible { bottom: 0; }
+  &.mui-visible {
+    bottom: 0;
+    height: auto !important;
+  }
 
   .mui-paper-container {
     padding-bottom: $desktop-gutter-mini;

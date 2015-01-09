@@ -7,54 +7,8 @@
 @import "html";
 @import "page-with-nav";
 @import "loader";
-@import "messages";
-
-.content-wrapper {
-  background-color: $canvas-color;
-  margin: 0 auto;
-  max-width: $device-large-width;
-}
-
-body.got-right-sidebar {
-  .content-wrapper {
-    margin-left: $desktop-gutter-mini;
-  }
-}
-
-.mui-app-bar {
-  .right { float: right; }
-}
-
-.mui-left-nav {
-  h1 {
-    cursor: pointer;
-    @extend .mui-font-style-headline;
-    @extend .mui-text-full-white;
-    line-height: $app-bar-height;
-    @extend .mui-font-weight-light;
-    background-color: $primary-1-color;
-    padding-left: $desktop-gutter;
-    padding-top: 0;
-    margin-bottom: $desktop-gutter-mini;
-  }
-}
-
-.mui-menu.right-nav {
-  width: 240px;
-  position: fixed;
-  top: $app-bar-height;
-  right: 0;
-  bottom: 0;
-  height: auto !important;
-
-  .mui-paper-container {
-    padding-bottom: $desktop-gutter-mini;
-  }
-}
-
-// add scrollbar to selected items
-.scrollable.mui-left-nav .mui-menu .mui-paper-container { overflow-y: auto !important; }
-.scrollable.mui-menu .mui-paper-container { overflow-y: auto !important; }
+@import "menus";
+@import "conversation";
 
 // @import "gist";
 // @import "link-embedder";

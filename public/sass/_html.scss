@@ -29,3 +29,15 @@ hr {
   margin-top: 0;
   margin-bottom: 18px;
 }
+
+.content-wrapper {
+  background-color: $canvas-color;
+  margin: 0 auto;
+  max-width: $device-large-width;
+}
+
+body.got-right-sidebar {
+  .content-wrapper {
+    margin-left: $desktop-gutter-mini;
+  }
+}

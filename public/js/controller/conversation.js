@@ -16,9 +16,9 @@ var Message = React.createClass({
         <IconButton icon="social-person" />
         <div className="content">
           <h4>{data.sender}</h4>
+          <Timestamp />
           <p>{loremIpsum()}</p>
         </div>
-        <Timestamp />
       </li>
     );
   }
@@ -34,7 +34,7 @@ module.exports = React.createClass({
     var messages = this.state.messages.map(function(m) { return <Message data={m} />; });
     return (
       <div className="content-wrapper">
-        <ul className="message-list">{messages}</ul>
+        <ul className="conversation">{messages}</ul>
         <Input />
       </div>
     );

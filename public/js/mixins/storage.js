@@ -13,11 +13,11 @@ module.exports.attr = function(name, builder, persistent) {
     if (!arguments.length) {
       return (
           storage.hasOwnProperty(name) ? storage[name]
-        : window.localStorage.hasOwnProperty(name) ? window.localStorage[name]
+        : window.localStorage.hasOwnProperty(name) ? JSON.parse(window.localStorage[name])
         : builder()
       );
     }
-    if (persistent) window.localStorage[name] = value;
+    if (persistent) window.localStorage[name] = JSON.stringify(value);
     storage[name] = value;
     for (k in callbacks) callbacks[k](name, value);
     return this;
@@ -30,7 +30,7 @@ module.exports.clear = function(name) {
   return value;
 };
 
-module.exports.set = function(name, value) {
+module.exports.store = function(name, value) {
   accessor[name](value);
 };
 

@@ -1,5 +1,5 @@
 var React = require('react');
-var Timestamp = require('../component/timestamp');
+var AutoupdateTime = require('react-autoupdate-time');
 var Input = require('../component/input');
 var Avatar = require('../component/avatar');
 
@@ -13,8 +13,8 @@ var Message = React.createClass({
         <Avatar image="https://secure.gravatar.com/avatar/4a49eb49e0b98ed1a1fb30b7d39baac3?s=40" />
         <div className="content">
           <h4>{data.sender}</h4>
-          <Timestamp />
-          <p>{loremIpsum()}</p>
+          <AutoupdateTime value={data.timestamp} interval={10000} />
+          <p>{data.message}</p>
         </div>
       </li>
     );
@@ -27,7 +27,9 @@ module.exports = React.createClass({
   },
   getInitialState: function() {
     return {
-      messages: ["Joe","Sarah","Joe","Joe","Bill","Sarah","Bill"].map(function(i) { return { sender: i }; })
+      messages: ["Joe","Sarah","Joe","Joe","Bill","Sarah","Bill"].map(function(i) {
+        return { sender: i, message: loremIpsum(), timestamp: new Date() };
+      })
     };
   },
   render: function() {

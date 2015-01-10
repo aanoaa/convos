@@ -5,8 +5,6 @@ var mui = require('material-ui');
 
 var Menu = mui.Menu;
 
-Storage.attr('rightNavOpen', function() { return false; }, true);
-
 module.exports = React.createClass({
   mixins: [
     Router.Navigation,

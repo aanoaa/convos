@@ -20,7 +20,7 @@ ul.conversation {
     margin: 0 $desktop-gutter-mini 0 $floating-action-button-size;
   }
 
-  .timestamp {
+  time {
     @extend .mui-font-style-body-1;
     @extend .mui-font-weight-light;
     @extend .mui-text-light-black;

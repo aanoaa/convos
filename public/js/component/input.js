@@ -15,7 +15,13 @@ module.exports = React.createClass({
   focus: function() {
     this.refs.field.getDOMNode().focus();
   },
+  onBlur: function() {
+    this.store('inputHasFocus', false);
+  },
   onChange: function(e) {}, // required, or the input field will be read-only
+  onFocus: function() {
+    this.store('inputHasFocus', true);
+  },
   onKeyDown: function(e) {
     console.log(e.keyCode);
   },
@@ -43,7 +49,16 @@ module.exports = React.createClass({
       <div className={classNames.join(' ')}>
         <Avatar image="http://s.gravatar.com/avatar/806800a3aeddbad6af673dade958933b?s=40" onClick={this.focus} />
         <div className="mui-input mui-text">
-          <input name="input_field" ref="field" type="text" placeholder="What's on your mind?" onChange={this.onChange} onKeyDown={this.onKeyDown} />
+          <input
+            name="input_field"
+            placeholder="What's on your mind?"
+            ref="field"
+            type="text"
+            onBlur={this.onBlur}
+            onChange={this.onChange}
+            onFocus={this.onFocus}
+            onKeyDown={this.onKeyDown}
+          />
           <span className="mui-input-bar"/>
         </div>
       </div>

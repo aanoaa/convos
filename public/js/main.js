@@ -7,8 +7,12 @@ var window = require('./utils/window');
 var Route = Router.Route;
 var DefaultRoute = Router.DefaultRoute;
 
-Storage.attr('nNotifications', function() { return 0; });
 Storage.attr('activeSidebar', function() { return ''; });
+Storage.attr('inputHasFocus', function() { return false; });
+Storage.attr('nNotifications', function() { return 0; });
+Storage.attr('rightNavOpen', function() { return false; }, true);
+Storage.attr('scrolledToBottom', function() { return false; });
+Storage.attr('wideScreen', function() { return false; });
 
 var routes = (
   <Route name="index" path="/" handler={require('./layouts/chat')}>

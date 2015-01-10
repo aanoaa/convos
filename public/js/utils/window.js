@@ -3,6 +3,8 @@ var Storage = require('../mixins/storage');
 var wasWideScreen = false;
 var wrapper;
 
+window.DEBUG = window.DEBUG || true;
+
 var contentWrapper = function() {
   if (!wrapper || !wrapper.parentNode) wrapper = document.querySelector('.mui-app-content-canvas');
   return wrapper || document.body;
@@ -28,11 +30,11 @@ window.addEventListener('scroll', function(e) {
 
 wasWideScreen = isWideScreen();
 wasScrolledToBottom = isScrolledToBottom();
-Storage.attr('scrolledToBottom', function() { return wasScrolledToBottom; });
-Storage.attr('wideScreen', function() { return wasWideScreen; });
 
 window.contentWrapper = contentWrapper;
+window.isApple = navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i);
 window.isScrolledToBottom = isScrolledToBottom;
+window.isTouchDevice = !!('ontouchstart' in window);
 window.isWideScreen = isWideScreen;
 
 window.scrollToBottom = function() {

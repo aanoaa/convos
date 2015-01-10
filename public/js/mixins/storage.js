@@ -18,6 +18,7 @@ module.exports.attr = function(name, builder, persistent) {
       );
     }
     if (persistent) window.localStorage[name] = JSON.stringify(value);
+    if (window.DEBUG) console.log('store(' + name + ', ' + value + ')');
     storage[name] = value;
     for (k in callbacks) callbacks[k](name, value);
     return this;
@@ -31,7 +32,8 @@ module.exports.clear = function(name) {
 };
 
 module.exports.store = function(name, value) {
-  accessor[name](value);
+  if (accessor[name]) return accessor[name](value);
+  console.error('No such accessor: ' + k);
 };
 
 // mixin({ stateName: "accessorName", ... });
@@ -62,7 +64,9 @@ module.exports.mixin = function(state2accessor) {
     },
     store: function(k, v) {
       var name = state2accessor[k];
-      if (name) accessor[name](v);
+      if (name) return accessor[name](v);
+      if (accessor[k]) return accessor[k](v);
+      console.error('Could not look up accessor: ' + k);
     }
   };
 };

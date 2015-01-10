@@ -8,7 +8,9 @@ var Route = Router.Route;
 var DefaultRoute = Router.DefaultRoute;
 
 Storage.attr('activeSidebar', function() { return ''; });
+Storage.attr('doNotDisturb', function() { return false; });
 Storage.attr('inputHasFocus', function() { return false; });
+Storage.attr('notificationsOpen', function() { return false; });
 Storage.attr('nNotifications', function() { return 0; });
 Storage.attr('rightNavOpen', function() { return false; }, true);
 Storage.attr('scrolledToBottom', function() { return false; });

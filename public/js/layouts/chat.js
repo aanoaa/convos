@@ -20,7 +20,6 @@ module.exports = React.createClass({
         </div>
         <AppBar
           toggleAppMenu={this.toggleAppMenu}
-          toggleNotifications={this.toggleNotifications}
           toggleRightMenu={this.toggleRightMenu}
           toggleSearch={this.toggleSearch}
         />

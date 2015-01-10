@@ -42,7 +42,7 @@ module.exports = React.createClass({
 
     if (!this.state.scrolledToBottom) {
       classNames.push('not-at-bottom');
-      if (this.state.hidden) classNames.push('hidden');
+      if (this.state.hidden) classNames.push('off');
     }
 
     return (

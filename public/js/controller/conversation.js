@@ -1,8 +1,7 @@
 var React = require('react');
 var AutoupdateTime = require('react-autoupdate-time');
-var Input = require('../component/input');
 var Avatar = require('../component/avatar');
-
+var Input = require('../component/input');
 var loremIpsum = require('lorem-ipsum')
 
 var Message = React.createClass({

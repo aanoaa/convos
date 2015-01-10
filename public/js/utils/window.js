@@ -36,6 +36,7 @@ window.isApple = navigator.userAgent.match(/iPhone/i) || navigator.userAgent.mat
 window.isScrolledToBottom = isScrolledToBottom;
 window.isTouchDevice = !!('ontouchstart' in window);
 window.isWideScreen = isWideScreen;
+window.TODO = function(message) { alert("TODO: " + message); };
 
 window.scrollToBottom = function() {
   document.body.scrollTop = window.innerHeight;

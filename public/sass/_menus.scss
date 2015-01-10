@@ -1,3 +1,5 @@
+$notifications-width: 300px;
+
 .mui-app-bar {
   .right { float: right; }
 }
@@ -32,7 +34,64 @@
   }
 }
 
+.notifications {
+  position: relative;
+  display: inline-block;
+
+  .mui-paper {
+    background: $canvas-color;
+    width: $notifications-width;
+    position: absolute;
+    top: 0;
+    right: -$desktop-gutter-less;
+    opacity: 1;
+
+    @include ease-out();
+
+    &.off {
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+    }
+  }
+
+  .scrollable {
+    padding-right: $desktop-gutter;
+    width: $notifications-width - $desktop-gutter;
+    height: 100%;
+  }
+
+  @media only screen and (max-width: 320px) {
+    $notifications-width: 260px;
+    .mui-paper { width: $notifications-width; }
+    .scrollable { width: $notifications-width - $desktop-gutter; }
+  }
+
+  li { list-style: none; }
+
+  h3 .mui-icon-button {
+    color: $body-text-color;
+    margin-left: $desktop-gutter-less;
+    padding: 0;
+    float: right;
+    cursor: pointer;
+  }
+
+  h4 {
+    @extend .mui-font-style-subhead-1;
+    @extend .mui-font-weight-medium;
+    margin: 0 0 3px 0;
+  }
+
+  p {
+    padding: 0;
+    max-height: 42px;
+    overflow: hidden;
+  }
+}
+
 // add scrollbar to selected items
+.notifications .scrollable,
 .scrollable.mui-left-nav .mui-menu .mui-paper-container,
 .scrollable.mui-menu .mui-paper-container {
   -webkit-overflow-scrolling: touch;

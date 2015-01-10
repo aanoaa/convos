@@ -46,7 +46,7 @@ ul.conversation {
     @include prefix(transition-timing-function, ease);
   }
 
-  &.hidden {
+  &.off {
     bottom: -100px;
   }
 

@@ -1,10 +1,7 @@
 var React = require('react');
 var Timestamp = require('../component/timestamp');
 var Input = require('../component/input');
-
-var mui = require('material-ui');
-var IconButton = mui.IconButton;
-var Paper = mui.Paper;
+var Avatar = require('../component/avatar');
 
 var loremIpsum = require('lorem-ipsum')
 
@@ -13,7 +10,7 @@ var Message = React.createClass({
     var data = this.props.data;
     return (
       <li>
-        <IconButton icon="social-person" />
+        <Avatar image="https://secure.gravatar.com/avatar/4a49eb49e0b98ed1a1fb30b7d39baac3?s=40" />
         <div className="content">
           <h4>{data.sender}</h4>
           <Timestamp />
@@ -25,9 +22,12 @@ var Message = React.createClass({
 });
 
 module.exports = React.createClass({
+  componentDidMount: function() {
+    window.scrollToBottom();
+  },
   getInitialState: function() {
     return {
-      messages: ["Joe","Sarah","Bill"].map(function(i) { return { sender: i }; })
+      messages: ["Joe","Sarah","Joe","Joe","Bill","Sarah","Bill"].map(function(i) { return { sender: i }; })
     };
   },
   render: function() {

@@ -10,5 +10,10 @@
 @import "menus";
 @import "conversation";
 
+.avatar {
+  padding: $desktop-gutter-mini;
+  float: left;
+}
+
 // @import "gist";
 // @import "link-embedder";

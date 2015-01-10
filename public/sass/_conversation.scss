@@ -1,28 +1,29 @@
-ul.conversation, .message-input-wrapper {
-  button.mui-icon-button {
-    margin: 0;
-    float: left;
-  }
-}
-
 ul.conversation {
-  padding: 10px 0;
-  overflow: hidden;
+  clear: left;
+  padding-top: $desktop-gutter;
+  padding-bottom: 80px;
 
-  li { list-style: none; }
+  li { list-style: none; overflow: hidden; }
+  p { padding-top: 0; }
 
   h4 {
     @extend .mui-font-style-subhead-1;
+    @extend .mui-font-weight-medium;
     margin: 0 0 3px 0;
   }
 
+  .avatar {
+    margin-top: 3px;
+  }
+
   .content {
-    margin: $desktop-gutter-less;
-    margin-left: $floating-action-button-size;
+    margin: 0 $desktop-gutter-mini 0 $floating-action-button-size;
   }
 
   .timestamp {
     @extend .mui-font-style-body-1;
+    @extend .mui-font-weight-light;
+    @extend .mui-text-light-black;
     margin: 0;
     margin-top: -$desktop-gutter;
     padding: 0;
@@ -31,19 +32,41 @@ ul.conversation {
 }
 
 .message-input-wrapper {
-  button.mui-icon-button {
-    padding-top: 0;
-    color: #79c;
+  background: $canvas-color;
+  border-top: 1px solid $border-color;
+  width: 100%;
+  max-width: $device-large-width;
+  height: auto;
+  position: fixed;
+  bottom: 0;
+
+  &.not-at-bottom {
+    @include prefix(transition-property, bottom);
+    @include prefix(transition-duration, 600ms);
+    @include prefix(transition-timing-function, ease);
+  }
+
+  &.hidden {
+    bottom: -100px;
   }
 
   .mui-input {
-    margin-left: $floating-action-button-size;
-    margin-right: $desktop-gutter-less;
+    margin: $desktop-gutter-less $desktop-gutter-less 0 $floating-action-button-size;
     overflow: hidden;
   }
 
   .mui-input .mui-input-bar,
   .mui-input input[type="text"] {
     width: 100%;
+  }
+
+  @media #{$device-medium} {
+    border-top: 0;
+  }
+}
+
+body.got-right-sidebar {
+  .message-input-wrapper {
+    left: $desktop-gutter-mini;
   }
 }

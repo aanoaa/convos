@@ -33,5 +33,8 @@
 }
 
 // add scrollbar to selected items
-.scrollable.mui-left-nav .mui-menu .mui-paper-container { overflow-y: auto !important; }
-.scrollable.mui-menu .mui-paper-container { overflow-y: auto !important; }
+.scrollable.mui-left-nav .mui-menu .mui-paper-container,
+.scrollable.mui-menu .mui-paper-container {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto !important;
+}

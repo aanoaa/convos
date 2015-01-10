@@ -238,7 +238,6 @@ sub _assets {
   my $aliasify = $self->home->rel_file('public/js/aliasify.js');
 
   $self->plugin('AssetPack');
-  $self->plugin('FontAwesome4', css => []);
 
   $self->asset->preprocessor(
     Browserify => {
@@ -251,8 +250,8 @@ sub _assets {
   );
 
   $ENV{SASS_PATH} = $self->home->rel_dir('vendor/material-ui-sass/');
-  $self->asset('c.css' => qw( /scss/font-awesome.scss /sass/convos.scss ));
-  $self->asset('c.js' => qw( /js/main.js ));    # skip for now: https://platform.twitter.com/widgets.js
+  $self->asset('c.css' => qw( /sass/convos.scss ));
+  $self->asset('c.js'  => qw( /js/main.js ));         # skip for now: https://platform.twitter.com/widgets.js
 }
 
 sub _before_dispatch {

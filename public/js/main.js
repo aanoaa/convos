@@ -2,7 +2,7 @@ var React = require('react/addons');
 var Router = require('react-router');
 var injectTapEventPlugin = require('react-tap-event-plugin');
 var Storage = require('./mixins/storage');
-var onResize = require('./utils/onresize');
+var window = require('./utils/window');
 
 var Route = Router.Route;
 var DefaultRoute = Router.DefaultRoute;

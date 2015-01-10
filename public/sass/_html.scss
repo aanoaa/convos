@@ -30,6 +30,10 @@ hr {
   margin-bottom: 18px;
 }
 
+.mui-app-content-canvas {
+  overflow: hidden;
+}
+
 .content-wrapper {
   background-color: $canvas-color;
   margin: 0 auto;

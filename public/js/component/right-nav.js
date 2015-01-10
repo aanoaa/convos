@@ -15,8 +15,8 @@ module.exports = React.createClass({
   ],
   componentClickAway: function(e) {
     if ((e.target.parentNode.className || '').indexOf('activate-right-nav') >= 0) return;
-    if (this.state.docked) return;
-    if (this.state.open) this.open(false);
+    if (!this.state.open) return;
+    this.open(false);
     e.preventDefault();
   },
   onSelect: function(e, i, payload) {

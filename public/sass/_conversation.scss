@@ -1,6 +1,6 @@
 ul.conversation, .message-input-wrapper {
   button.mui-icon-button {
-    margin: 0 $desktop-gutter-less;
+    margin: 0;
     float: left;
   }
 }
@@ -9,23 +9,16 @@ ul.conversation {
   padding: 10px 0;
   overflow: hidden;
 
-  li {
-    list-style: none;
-  }
+  li { list-style: none; }
 
-  button.mui-icon-button {
-    margin: 0 $desktop-gutter-less;
-    float: left;
+  h4 {
+    @extend .mui-font-style-subhead-1;
+    margin: 0 0 3px 0;
   }
 
   .content {
     margin: $desktop-gutter-less;
     margin-left: $floating-action-button-size;
-  }
-
-  h4 {
-    @extend .mui-font-style-subhead-1;
-    margin: 0 0 3px 0;
   }
 
   .timestamp {

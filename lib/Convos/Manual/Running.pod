@@ -129,8 +129,6 @@ C</etc/default/convos>. Example:
   CONVOS_BACKEND_PID_FILE=/var/run/convos-backend.pid
   CONVOS_BACKEND_LOGFILE=/var/log/convos/backend.log
 
-  CONVOS_REDIS_URL=redis://localhost:6397/1
-
 Note: L<Hypnotoad> only reads these environment variables on start/restart,
 and not on reload.
  

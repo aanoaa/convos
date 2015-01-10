@@ -6,7 +6,7 @@ Convos::Manual::Environment - Environment variables for Convos
 
 You can change the behavior of L<Convos> by setting environment variables:
 
-  $ CONVOS_REDIS_URL=localhost/12 ./script/convos
+  $ ./script/convos
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -30,26 +30,6 @@ into images, movies or other dynamic content.
 
 Set this to customize the organization name on the landing page, in the title
 tag and other various sites. The default is L<Nordaaker|http://nordaaker.com/>.
-
-=head2 CONVOS_REDIS_URL
-
-This is the URL to the Redis backend, and should follow this format:
-
-  redis://x:password@server:port/database_index
-  redis://127.0.0.1:6379/1 # suggested value
-
-Convos will use C<REDISCLOUD_URL>, C<REDISTOGO_URL>,
-C<DOTCLOUD_DATA_REDIS_URL> or default to "redis://127.0.0.1:6379/1" unless
-C<CONVOS_REDIS_URL> is not set.
-
-Note! The default value is only used when in "production" mode. This means
-that running L<Convos> with C<morbo> require the Redis URL to be set with
-the environment variable.
-
-It is also possible to set C<CONVOS_REDIS_INDEX=2> to use the
-database index 2, instead of the default. This is useful when
-C<REDISTOGO_URL> or C<DOTCLOUD_DATA_REDIS_URL> does not contain
-the datbase index.
 
 =head2 CONVOS_INVITE_CODE
 

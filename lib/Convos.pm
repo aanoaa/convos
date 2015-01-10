@@ -143,7 +143,6 @@ Backend functionality.
 =cut
 
 use Mojo::Base 'Mojolicious';
-use Mojo::Redis;
 use Mojo::Util qw( md5_sum );
 use File::Spec::Functions qw( catdir catfile tmpdir );
 use File::Basename qw( dirname );
@@ -168,7 +167,7 @@ DEPRECATED.
 
 has core => sub {
   my $self = shift;
-  my $core = Convos::Core->new(redis => $self->redis);
+  my $core = Convos::Core->new;
 
   $core->log($self->log);
   $core->archive->log_dir($ENV{CONVOS_ARCHIVE_DIR} || $self->home->rel_dir('irc_logs'));
@@ -203,8 +202,7 @@ sub startup {
   $self->ua->max_redirects(2);             # support getting facebook pictures
   $self->plugin('Convos::Plugin::Helpers');
   $self->plugin('LinkEmbedder');
-  $self->secrets([time]);                  # will be replaced by _set_secrets()
-  $self->_redis_url;
+  $self->secrets([rand]);
 
   return if $ENV{CONVOS_BACKEND_ONLY};     # set script/convos when started as backend
 
@@ -233,7 +231,6 @@ sub startup {
   $self->_embed_backend if $ENV{CONVOS_BACKEND_EMBEDDED};
 
   Scalar::Util::weaken($self);
-  Mojo::IOLoop->timer(0 => sub { $self->_set_secrets });
 }
 
 sub _assets {
@@ -265,9 +262,6 @@ sub _before_dispatch {
 
   if (my $base = $c->req->headers->header('X-Request-Base')) {
     $c->req->url->base(Mojo::URL->new($base));
-  }
-  if (!$c->app->config->{hostname_is_set}++) {
-    $c->redis->set('convos:frontend:url' => $c->req->url->base->to_abs->to_string);
   }
 }
 
@@ -356,62 +350,6 @@ sub _public_routes {
   $r->post('/register/:invite', {invite => ''})->to('user#register');
   $r->get('/logout')->to('user#logout')->name('logout');
   $r;
-}
-
-sub _redis_url {
-  my $self = shift;
-  my $url;
-
-  for my $k (qw( CONVOS_REDIS_URL REDISTOGO_URL REDISCLOUD_URL DOTCLOUD_DATA_REDIS_URL )) {
-    $url = $ENV{$k} or next;
-    $self->log->debug("Using $k environment variable as Redis connection URL.");
-    last;
-  }
-
-  unless ($url) {
-    if ($self->config('redis')) {
-      $self->log->warn("'redis' url from config file will be deprecated. Run 'perldoc Convos' for alternative setup.");
-      $url = $self->config('redis');
-    }
-    elsif ($self->mode eq 'production') {
-      $self->log->debug("Using default Redis connection URL redis://127.0.0.1:6379/1");
-      $url = 'redis://127.0.0.1:6379/1';
-    }
-    else {
-      $self->log->debug("Could not find CONVOS_REDIS_URL value.");
-      return;
-    }
-  }
-
-  $url = Mojo::URL->new($url);
-  $url->path($ENV{CONVOS_REDIS_INDEX}) if $ENV{CONVOS_REDIS_INDEX} and !$url->path->[0];
-  $ENV{CONVOS_REDIS_URL} = $url->to_string;
-}
-
-sub _set_secrets {
-  my $self  = shift;
-  my $redis = $self->redis;
-
-  $self->delay(
-    sub {
-      my ($delay) = @_;
-      $redis->lrange('convos:secrets', 0, -1, $delay->begin);
-      $redis->getset('convos:secrets:lock' => 1, $delay->begin);
-      $redis->expire('convos:secrets:lock' => 5);
-    },
-    sub {
-      my ($delay, $secrets, $locked) = @_;
-
-      $secrets ||= $self->config->{secrets};
-
-      return $self->app->secrets($secrets) if $secrets and @$secrets;
-      return $self->_set_secrets if $locked;
-      $secrets = [md5_sum rand . $$ . time];
-      $self->app->secrets($secrets);
-      $redis->lpush('convos:secrets', $secrets->[0]);
-      $redis->del('convos:secrets:lock');
-    },
-  );
 }
 
 sub DESTROY {

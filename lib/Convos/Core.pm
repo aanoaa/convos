@@ -29,15 +29,10 @@ Holds a L<Convos::Archive::File> object.
 
 Holds a L<Mojo::Log> object.
 
-=head2 redis
-
-Holds a L<Mojo::Redis> object.
-
 =cut
 
 has archive => sub { require Convos::Archive::File; Convos::Archive::File->new; };
-has log     => sub { Mojo::Log->new };
-has redis   => sub { die 'redis connection required in constructor' };
+has log => sub { Mojo::Log->new };
 
 =head1 METHODS
 
@@ -118,7 +113,6 @@ sub _start_control_channel {
     $self->$action($login, $name);
   };
 
-  $self->{control} = Mojo::Redis->new(server => $self->redis->server);
   $self->{control}->$cb(['core:control']);
   $self->{control}->on(
     error => sub {

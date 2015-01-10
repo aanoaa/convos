@@ -198,31 +198,6 @@ sub _parse_message {
 
 See L<Convos::Core::Util/logf>.
 
-=head2 redis
-
-Returns a L<Mojo::Redis> object.
-
-=cut
-
-sub redis {
-  my $c = shift;
-  my $cache_to = $c->{tx} ? 'stash' : sub { $c->app->defaults };
-
-  $c->$cache_to->{redis} ||= do {
-    my $log   = $c->app->log;
-    my $url   = $ENV{CONVOS_REDIS_URL} or die "CONVOS_REDIS_URL is not set. Run 'perldoc Convos' for details.\n";
-    my $redis = Mojo::Redis->new(server => $url);
-
-    $redis->on(
-      error => sub {
-        $log->error("[REDIS ERROR] $_[1]");
-      }
-    );
-
-    $redis;
-  };
-}
-
 =head2 notification_list
 
 Will render notifications.

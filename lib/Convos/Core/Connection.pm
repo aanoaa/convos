@@ -11,7 +11,6 @@ Convos::Core::Connection - Represents a connection to an IRC server
   $c = Convos::Core::Connection->new(
          name => 'magnet',
          login => 'username',
-         redis => Mojo::Redis->new,
        );
 
   $c->connect;
@@ -73,16 +72,11 @@ Holds a L<Mojo::Log> object.
 
 The username of the owner.
 
-=head2 redis
-
-Holds a L<Mojo::Redis> object.
-
 =cut
 
 has name  => '';
 has log   => sub { Mojo::Log->new };
 has login => 0;
-has redis => sub { die 'redis connection required in constructor' };
 
 my @ADD_MESSAGE_EVENTS        = qw( irc_privmsg ctcp_action irc_notice );
 my @ADD_SERVER_MESSAGE_EVENTS = qw(

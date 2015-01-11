@@ -19,19 +19,24 @@ $search-width: 400px;
   }
 }
 
-.mui-menu.right-nav {
-  width: 240px;
-  position: fixed;
-  top: $app-bar-height;
-  right: 0;
+.right-nav {
+  position: relative;
+  display: inline-block;
 
-  &.mui-visible {
-    bottom: 0;
-    height: auto !important;
-  }
+  .mui-menu {
+    width: 240px;
+    position: fixed;
+    top: $app-bar-height;
+    right: 0;
 
-  .mui-paper-container {
-    padding-bottom: $desktop-gutter-mini;
+    &.mui-visible {
+      bottom: 0;
+      height: auto !important;
+    }
+
+    .mui-paper-container {
+      padding-bottom: $desktop-gutter-mini;
+    }
   }
 }
 

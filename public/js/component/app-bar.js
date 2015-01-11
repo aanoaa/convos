@@ -1,6 +1,7 @@
 var React = require('react');
 var Storage = require('../mixins/storage');
 var Notifications = require('../component/notifications');
+var RightNav = require('../component/right-nav');
 var Search = require('../component/search');
 var mui = require('material-ui');
 
@@ -23,7 +24,7 @@ module.exports = React.createClass({
         <div className="right">
           <Search />
           <Notifications />
-          <IconButton className="activate-right-nav" icon="navigation-more-vert" onTouchTap={this.props.toggleRightMenu} />
+          <RightNav />
         </div>
       </AppBar>
     );

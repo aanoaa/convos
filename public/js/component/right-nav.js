@@ -1,22 +1,15 @@
 var React = require('react');
-var Router = require('react-router');
 var Storage = require('../mixins/storage');
 var mui = require('material-ui');
 
 var Menu = mui.Menu;
+var IconButton = mui.IconButton;
 
 module.exports = React.createClass({
   mixins: [
-    Router.Navigation,
     require('../mixins/click-awayable'),
     Storage.mixin({ open: 'rightNavOpen', docked: 'wideScreen' })
   ],
-  componentClickAway: function(e) {
-    if ((e.target.parentNode.className || '').indexOf('activate-right-nav') >= 0) return;
-    if (!this.state.open || this.state.docked) return;
-    this.open(false);
-    e.preventDefault();
-  },
   onSelect: function(e, i, payload) {
     console.log(payload);
   },
@@ -40,13 +33,16 @@ module.exports = React.createClass({
     document.body.classList[docked ? "add" : "remove"]("got-right-sidebar");
 
     return (
-      <Menu
-        className="right-nav scrollable"
-        hideable={true}
-        visible={this.state.open}
-        menuItems={this.state.menuItems}
-        onItemClick={this.onSelect}
-      />
+      <div className="right-nav">
+        <IconButton className="activate-right-nav" icon="navigation-more-vert" onTouchTap={this.open} />
+        <Menu
+          className="right-nav scrollable"
+          hideable={true}
+          visible={this.state.open}
+          menuItems={this.state.menuItems}
+          onItemClick={this.onSelect}
+        />
+      </div>
     );
   }
 });

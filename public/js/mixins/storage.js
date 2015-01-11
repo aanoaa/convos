@@ -46,6 +46,7 @@ module.exports.mixin = function(state2accessor) {
     var state = {};
     if (!accessor2state[name]) return;
     state[accessor2state[name]] = value;
+    this.state[accessor2state[name]] = value;
     this.setState(state);
   };
 

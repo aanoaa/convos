@@ -13,7 +13,9 @@ module.exports = {
     if (!this.isMounted()) return;
     if (e.target == el) return;
     if (Dom.isNodeDescendantOf(e.target, el)) return;
-    this.componentClickAway(e);
+    if (this.componentClickAway) return this.componentClickAway(e);
+    if (!this.state.open) return;
+    this.open(false);
   },
   _bindClickAway: function() {
     Events.on(document, 'click', this._checkClickAway);

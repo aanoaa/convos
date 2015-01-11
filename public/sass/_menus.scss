@@ -1,4 +1,5 @@
 $notifications-width: 300px;
+$search-width: 400px;
 
 .mui-app-bar {
   .right { float: right; }
@@ -34,13 +35,56 @@ $notifications-width: 300px;
   }
 }
 
-.notifications {
+.app-bar-dropdown {
   position: relative;
   display: inline-block;
 
+  &.notifications {
+    .mui-paper { width: $notifications-width; }
+
+    .scrollable {
+      padding-right: $desktop-gutter;
+      width: $notifications-width - $desktop-gutter;
+      height: 100%;
+    }
+
+    @media only screen and (max-width: 320px) {
+      $notifications-width: 260px;
+      .mui-paper { width: $notifications-width; }
+      .scrollable { width: $notifications-width - $desktop-gutter; }
+    }
+  }
+
+  &.search {
+    .mui-paper { width: $search-width; }
+
+    .scrollable {
+      padding-right: $desktop-gutter;
+      width: $search-width - $desktop-gutter;
+      height: 100%;
+    }
+
+    .header {
+      .mui-icon-button {
+        color: $body-text-color;
+        padding: 0;
+        float: right;
+      }
+
+      .mui-input { margin-right: 40px; }
+      input { width: 100%; }
+    }
+
+    @media only screen and (max-width: 320px) {
+      $search-width: 260px;
+      .mui-paper { width: $search-width; }
+      .scrollable { width: $search-width - $desktop-gutter; }
+    }
+  }
+
+
   .mui-paper {
     background: $canvas-color;
-    width: $notifications-width;
     position: absolute;
     top: 0;
     right: -$desktop-gutter-less;
@@ -55,18 +99,6 @@ $notifications-width: 300px;
     }
   }
 
-  .scrollable {
-    padding-right: $desktop-gutter;
-    width: $notifications-width - $desktop-gutter;
-    height: 100%;
-  }
-
-  @media only screen and (max-width: 320px) {
-    $notifications-width: 260px;
-    .mui-paper { width: $notifications-width; }
-    .scrollable { width: $notifications-width - $desktop-gutter; }
-  }
-
   li { list-style: none; }
 
   h3 .mui-icon-button {
@@ -74,7 +106,6 @@ $notifications-width: 300px;
     margin-left: $desktop-gutter-less;
     padding: 0;
     float: right;
-    cursor: pointer;
   }
 
   h4 {
@@ -91,7 +122,7 @@ $notifications-width: 300px;
 }
 
 // add scrollbar to selected items
-.notifications .scrollable,
+.app-bar-dropdown .scrollable,
 .scrollable.mui-left-nav .mui-menu .mui-paper-container,
 .scrollable.mui-menu .mui-paper-container {
   -webkit-overflow-scrolling: touch;

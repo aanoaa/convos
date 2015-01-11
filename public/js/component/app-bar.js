@@ -1,6 +1,7 @@
 var React = require('react');
 var Storage = require('../mixins/storage');
 var Notifications = require('../component/notifications');
+var Search = require('../component/search');
 var mui = require('material-ui');
 
 var AppBar = mui.AppBar;
@@ -20,8 +21,8 @@ module.exports = React.createClass({
         zDepth={0}
       >
         <div className="right">
-          <IconButton icon="action-search" onTouchTap={this.props.toggleSearch} />
-          <Notifications ref="notifications" />
+          <Search />
+          <Notifications />
           <IconButton className="activate-right-nav" icon="navigation-more-vert" onTouchTap={this.props.toggleRightMenu} />
         </div>
       </AppBar>

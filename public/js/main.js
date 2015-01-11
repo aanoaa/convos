@@ -14,6 +14,7 @@ Storage.attr('notificationsOpen', function() { return false; });
 Storage.attr('nNotifications', function() { return 0; });
 Storage.attr('rightNavOpen', function() { return false; }, true);
 Storage.attr('scrolledToBottom', function() { return false; });
+Storage.attr('searchOpen', function() { return false; });
 Storage.attr('wideScreen', function() { return false; });
 
 var routes = (

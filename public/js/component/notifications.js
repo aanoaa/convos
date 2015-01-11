@@ -26,11 +26,6 @@ module.exports = React.createClass({
     require('../mixins/click-awayable'),
     Storage.mixin({ doNotDisturb: 'doNotDisturb', open: 'notificationsOpen' })
   ],
-  componentClickAway: function(e) {
-    if (!this.state.open) return;
-    this.open(false);
-    e.preventDefault();
-  },
   getInitialState: function() {
     return {
       notifications: ["Joe","Joe","Bill","Joe","Joe","Bill","Joe","Sarah","Sarah","Bill"].map(function(i) {
@@ -43,8 +38,7 @@ module.exports = React.createClass({
   },
   open: function(state) {
     this.refs.scrollable.getDOMNode().style.maxHeight = (window.innerHeight - 80) + 'px';
-    if (arguments.length) return this.store('open', state);
-    return this.store('open', !this.state.open);
+    this.store('open', typeof state === 'boolean' ? state : !this.state.open);
   },
   toggleDoNotDisturb: function() {
     this.store('doNotDisturb', !this.state.doNotDisturb);
@@ -54,7 +48,7 @@ module.exports = React.createClass({
     var dnd = this.state.doNotDisturb;
 
     return (
-      <div className="notifications">
+      <div className="app-bar-dropdown notifications">
         <IconButton className="activate-notifications" icon="social-notifications" onTouchTap={this.open} />
         <Paper ref="inner" className={this.state.open ? '' : 'off'}>
           <h3>

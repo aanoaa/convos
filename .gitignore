@@ -12,6 +12,7 @@ Makefile*
 MANIFEST*
 !MANIFEST.SKIP
 *META.*
+*.cache
 /lib/Convos/public/packed
 /local
 /log

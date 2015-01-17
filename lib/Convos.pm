@@ -240,14 +240,7 @@ sub _assets {
   $self->plugin('AssetPack');
 
   $self->asset->preprocessor(
-    Browserify => {
-      browserify_args => [-g             => $aliasify, -g => 'reactify'],
-      bundle_modules  => {'react/addons' => ['react-tap-event-plugin']},
-      ignore_modules  => ['react'],
-      environment     => $self->mode,
-      extensions      => [qw( js jsx )]
-    }
-  );
+    Browserify => {transformers => [$aliasify, [reactify => {es6 => 1}], 'envify'], extensions => [qw( js jsx )]});
 
   $ENV{SASS_PATH} = $self->home->rel_dir('vendor/material-ui-sass/');
   $self->asset('c.css' => qw( /sass/convos.scss ));

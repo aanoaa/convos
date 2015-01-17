@@ -76,3 +76,4 @@
 \.sass-cache
 ^irc_logs
 ^node_modules
+\.cache$

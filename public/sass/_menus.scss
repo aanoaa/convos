@@ -67,9 +67,9 @@ $search-width: 400px;
   &.off { z-index: 10; }
 
   .mui-paper {
-    background: $canvas-color;
+    background: white;
     position: absolute;
-    top: 0;
+    top: 3px;
     right: -$desktop-gutter-less;
     opacity: 1;
 

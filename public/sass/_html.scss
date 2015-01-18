@@ -5,7 +5,6 @@ html {
   -webkit-font-smoothing: antialiased;
   color: $body-text-color;
   font-family: $contentFontFamily;
-  background: #ececec; // either this or canvas-color
   background: $canvas-color;
 }
 

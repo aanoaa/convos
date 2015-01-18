@@ -28,7 +28,11 @@ window.addEventListener('scroll', function(e) {
   Storage.store('scrolledToBottom', (wasScrolledToBottom = !wasScrolledToBottom));
 });
 
-wasWideScreen = isWideScreen();
+setTimeout(function() {
+  wasWideScreen = isWideScreen();
+  Storage.store('wideScreen', wasWideScreen);
+}, 1);
+
 wasScrolledToBottom = isScrolledToBottom();
 
 window.contentWrapper = contentWrapper;

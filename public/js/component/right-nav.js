@@ -25,6 +25,7 @@ module.exports = React.createClass({
     };
   },
   open: function(state) {
+    if (typeof state === 'boolean' && this.state.docked) return;
     this.store('open', typeof state === 'boolean' ? state : !this.state.open);
   },
   render: function() {

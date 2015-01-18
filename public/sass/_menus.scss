@@ -22,6 +22,7 @@ $search-width: 400px;
 .right-nav {
   position: relative;
   display: inline-block;
+  z-index: 2;
 
   .mui-menu {
     width: 240px;
@@ -43,6 +44,7 @@ $search-width: 400px;
 .app-bar-dropdown {
   position: relative;
   display: inline-block;
+  z-index: 3;
 
   &.notifications {
     .mui-paper { width: $notifications-width; }

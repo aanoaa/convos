@@ -6,12 +6,11 @@ var Search = require('../component/search');
 var mui = require('material-ui');
 
 var AppBar = mui.AppBar;
-var IconButton = mui.IconButton;
 
 module.exports = React.createClass({
   mixins: [ Storage.mixin({ inputHasFocus: 'inputHasFocus' }) ],
   render: function() {
-    var title = "#mojo";
+    var title = "#mojo - 🐯 hear me roar";
     var hide = window.isApple && this.state.inputHasFocus;
 
     return (

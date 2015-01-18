@@ -2,7 +2,25 @@ $notifications-width: 300px;
 $search-width: 400px;
 
 .mui-app-bar {
-  .right { float: right; }
+  top: 0;
+
+  &.off { display: none; }
+
+  .mui-app-bar-title {
+    overflow: hidden;
+    white-space: pre;
+    float: none;
+  }
+
+  .right {
+    background: $app-bar-color;
+    height: $app-bar-height;
+    float: right;
+    position: absolute;
+    top: 0;
+    right: 0;
+    @include prefix(box-shadow, -3px -2px 3px 0 rgba(darken($app-bar-color, 4%), 0.55));
+  }
 }
 
 .mui-left-nav {
@@ -22,7 +40,7 @@ $search-width: 400px;
 .right-nav {
   position: relative;
   display: inline-block;
-  z-index: 2;
+  z-index: 5;
 
   .mui-menu {
     width: 240px;
@@ -44,7 +62,25 @@ $search-width: 400px;
 .app-bar-dropdown {
   position: relative;
   display: inline-block;
-  z-index: 3;
+  z-index: 15;
+
+  &.off { z-index: 10; }
+
+  .mui-paper {
+    background: $canvas-color;
+    position: absolute;
+    top: 0;
+    right: -$desktop-gutter-less;
+    opacity: 1;
+
+    @include ease-out();
+
+    &.off {
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+    }
+  }
 
   &.notifications {
     .mui-paper { width: $notifications-width; }
@@ -79,30 +115,13 @@ $search-width: 400px;
       }
 
       .mui-input { margin-right: 40px; }
-      input { width: 100%; }
+      .mui-input-bar, input { width: 100%; }
     }
 
     @media only screen and (max-width: 320px) {
-      $search-width: 260px;
-      .mui-paper { width: $search-width; }
+      $search-width: 270px;
+      .mui-paper { right: -64px; width: $search-width; }
       .scrollable { width: $search-width - $desktop-gutter; }
-    }
-  }
-
-
-  .mui-paper {
-    background: $canvas-color;
-    position: absolute;
-    top: 0;
-    right: -$desktop-gutter-less;
-    opacity: 1;
-
-    @include ease-out();
-
-    &.off {
-      opacity: 0;
-      height: 0;
-      overflow: hidden;
     }
   }
 

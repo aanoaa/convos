@@ -48,9 +48,9 @@ module.exports = React.createClass({
     var dnd = this.state.doNotDisturb;
 
     return (
-      <div className="app-bar-dropdown notifications">
+      <div className={"app-bar-dropdown notifications " + (this.state.open ? "on" : "off")}>
         <IconButton className="activate-notifications" icon="social-notifications" onTouchTap={this.open} />
-        <Paper ref="inner" className={this.state.open ? '' : 'off'}>
+        <Paper ref="inner" className={this.state.open ? "on" : "off"}>
           <h3>
             Notifications
             <IconButton tooltip={"Turn notifications " + (dnd ? "on" : "off")} icon={"social-notifications-" + (dnd ? "off" : "on")} onTouchTap={this.toggleDoNotDisturb} />

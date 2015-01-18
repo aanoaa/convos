@@ -42,9 +42,9 @@ module.exports = React.createClass({
     if (this.state.open) classNames.push('active');
 
     return (
-      <div className="app-bar-dropdown search">
+      <div className={"app-bar-dropdown search " + (this.state.open ? "on" : "off")}>
         <IconButton icon="action-search" onTouchTap={this.open} />
-        <Paper ref="inner" className={this.state.open ? '' : 'off'}>
+        <Paper ref="inner" className={this.state.open ? "" : "off"}>
           <div className="header">
             <IconButton icon="action-search" onTouchTap={this.search} />
             <Input ref="input" type="text" name="search_field" />

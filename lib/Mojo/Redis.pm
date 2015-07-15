@@ -34,7 +34,7 @@ has protocol => sub {
   my $protocol = $self->protocol_redis->new(api => 1)
     or Carp::croak('protocol_redis implementation does not support APIv1');
 
-  Scalar::Util::weaken($self);
+  # Scalar::Util::weaken($self);
   $protocol->on_message(sub { shift; $self->_return_command_data(@_); });
   $protocol;
 };

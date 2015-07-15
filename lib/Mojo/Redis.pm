@@ -31,7 +31,8 @@ has protocol_redis => sub {
 
 has protocol => sub {
   my $self = shift;
-  my $protocol = $self->protocol_redis->new(api => 1) or Carp::croak('protocol_redis implementation does not support APIv1');
+  my $protocol = $self->protocol_redis->new(api => 1)
+    or Carp::croak('protocol_redis implementation does not support APIv1');
 
   Scalar::Util::weaken($self);
   $protocol->on_message(sub { shift; $self->_return_command_data(@_); });
@@ -40,11 +41,11 @@ has protocol => sub {
 
 sub timeout {
   return $_[0]->{timeout} || 0 unless @_ > 1;
-  my($self, $t) = @_;
+  my ($self, $t) = @_;
   my $id = $self->{connection};
 
-  if(my $id = $self->{connection}) {
-    if(my $stream = $self->ioloop->stream($id)) {
+  if (my $id = $self->{connection}) {
+    if (my $stream = $self->ioloop->stream($id)) {
       $stream->timeout($t);
     }
   }
@@ -53,7 +54,8 @@ sub timeout {
   $self;
 }
 
-for my $cmd (qw/
+for my $cmd (
+  qw/
   append auth bgrewriteaof bgsave blpop brpop brpoplpush config_get config_set
   config_resetstat dbsize debug_object debug_segfault decr decrby del discard
   echo exec exists expire expireat flushall flushdb get getbit getrange getset
@@ -67,38 +69,34 @@ for my $cmd (qw/
   unwatch watch zadd zcard zcount zincrby zinterstore zrange
   zrangebyscore zrank zrem zremrangebyrank zremrangebyscore zrevrange
   zrevrangebyscore zrevrank zscore zunionstore
-/) {
-  eval(
-    "sub $cmd {"
-   .'my $self = shift;'
-   ."\$self->execute($cmd => \@_) } 1;"
-  ) or die $@;
+  /
+  )
+{
+  eval("sub $cmd {" . 'my $self = shift;' . "\$self->execute($cmd => \@_) } 1;") or die $@;
 }
 
 sub DESTROY {
-  $_[0]->ioloop or return; # may be undef during global destruction
+  $_[0]->ioloop or return;    # may be undef during global destruction
   $_[0]->disconnect;
 }
 
 sub connect {
   my $self = shift;
-  my $url = $self->_server_to_url;
-  my($auth, $db_index);
+  my $url  = $self->_server_to_url;
+  my ($auth, $db_index);
 
   Scalar::Util::weaken $self;
   $auth = (split /:/, $url->userinfo || '')[1];
   $db_index = ($url->path =~ /(\d+)/)[0] || '';
 
-  $self->disconnect if $self->{connecting} or $self->{connection}; # drop old connection
+  $self->disconnect if $self->{connecting} or $self->{connection};    # drop old connection
   $self->{connecting} = 1;
   $self->{connection} = $self->ioloop->client(
-    { address => $url->host,
-      port    => $url->port || 6379,
-    },
+    {address => $url->host, port => $url->port || 6379,},
     sub {
       my ($loop, $error, $stream) = @_;
 
-      if($error) {
+      if ($error) {
         $self->_inform_queue(error => $error);
         return;
       }
@@ -106,8 +104,8 @@ sub connect {
       $stream->timeout($self->timeout);
       $stream->on(
         read => sub {
-          my($stream, $chunk) = @_;
-          if(DEBUG) {
+          my ($stream, $chunk) = @_;
+          if (DEBUG) {
             my $c2 = $chunk;
             $c2 =~ s/\r?\n/','/g;
             warn "REDIS[@{[$self->{connection}]}] >>> ['$c2']\n";
@@ -124,27 +122,27 @@ sub connect {
       );
       $stream->on(
         error => sub {
-          $self or return; # $self may be undef during global destruction
+          $self or return;    # $self may be undef during global destruction
           $self->_inform_queue(error => $_[1]);
         }
       );
       $stream->on(
         timeout => sub {
-          $self or return; # $self may be undef during global destruction
+          $self or return;    # $self may be undef during global destruction
           $self->_inform_queue(error => 'Timeout');
         }
       );
 
       my $mqueue = $self->{message_queue} ||= [];
-      my $cqueue = $self->{cb_queue} ||= [];
+      my $cqueue = $self->{cb_queue}      ||= [];
 
-      if($db_index =~ /^\d+/) { # need to be before defined $auth below
-        unshift @$mqueue, [ SELECT => $db_index ];
-        unshift @$cqueue, sub {}; # no error handling needed. got on(error => ...)
+      if ($db_index =~ /^\d+/) {    # need to be before defined $auth below
+        unshift @$mqueue, [SELECT => $db_index];
+        unshift @$cqueue, sub { };    # no error handling needed. got on(error => ...)
       }
-      if(defined $auth) {
-        unshift @$mqueue, [ AUTH => $auth ];
-        unshift @$cqueue, sub {}; # no error handling needed. got on(error => ...)
+      if (defined $auth) {
+        unshift @$mqueue, [AUTH => $auth];
+        unshift @$cqueue, sub { };    # no error handling needed. got on(error => ...)
       }
 
       delete $self->{connecting};
@@ -167,7 +165,7 @@ sub disconnect {
   delete $self->{connecting};
   delete $self->{protocol};
 
-  if(my $id = delete $self->{connection} and $self->{ioloop}) {
+  if (my $id = delete $self->{connection} and $self->{ioloop}) {
     $self->{ioloop}->remove($id);
   }
 
@@ -175,12 +173,12 @@ sub disconnect {
 }
 
 sub on {
-  my($self, $event, @args) = @_;
+  my ($self, $event, @args) = @_;
   my $method = @args > 1 ? $ON_SPECIAL{$event} : '';
-  my $name = $event;
-  my $cb = pop @args;
+  my $name   = $event;
+  my $cb     = pop @args;
 
-  if($method) {
+  if ($method) {
     $name = join ':', $event, @args;
     $self->$method($name, $event, @args);
   }
@@ -189,12 +187,12 @@ sub on {
 }
 
 sub once {
-  my($self, $event, @args) = @_;
+  my ($self, $event, @args) = @_;
   my $method = @args > 1 ? $ON_SPECIAL{$event} : '';
-  my $name = $event;
-  my $cb = pop @args;
+  my $name   = $event;
+  my $cb     = pop @args;
 
-  if($method) {
+  if ($method) {
     $name = join ':', $event, @args;
     $self->$method($name, $event, @args);
   }
@@ -203,7 +201,7 @@ sub once {
 }
 
 sub unsubscribe {
-  my($self, $event, @args) = @_;
+  my ($self, $event, @args) = @_;
   my $method = $ON_SPECIAL{$event};
   my @cb;
 
@@ -212,7 +210,7 @@ sub unsubscribe {
   $event = join ':', $event, @args;
   $self->SUPER::unsubscribe($event, @cb);
 
-  unless($self->has_subscribers($event)) {
+  unless ($self->has_subscribers($event)) {
     my $conn = delete $self->{connections}{$event};
     $conn->disconnect if $conn;
   }
@@ -221,31 +219,31 @@ sub unsubscribe {
 }
 
 sub subscribe {
-  my($self, @channels) = @_;
+  my ($self, @channels) = @_;
   $self->_subscribe_generic('subscribe', @channels);
 }
 
 sub psubscribe {
-  my($self, @channels) = @_;
+  my ($self, @channels) = @_;
   $self->_subscribe_generic('psubscribe', @channels);
 }
 
 sub _subscribe_generic {
-  my($self, $type, @channels) = @_;
+  my ($self, $type, @channels) = @_;
   my $cb = ref $channels[-1] eq 'CODE' ? pop @channels : undef;
   my $n = 0;
 
-  if(!$cb) {
+  if (!$cb) {
     return $self->_clone('Mojo::Redis::Subscription' => channels => [@channels], type => $type)->connect;
   }
 
   # need to attach new callback to the protocol object
   Scalar::Util::weaken $self;
-  push @{ $self->{cb_queue} }, ($cb) x (@channels - 1);
+  push @{$self->{cb_queue}}, ($cb) x (@channels - 1);
   $self->execute(
-    [ $type => @channels ],
+    [$type => @channels],
     sub {
-      shift; # we already got $self
+      shift;    # we already got $self
       $self->$cb(@_);
       $self->{protocol} = $self->protocol_redis->new(api => 1);
       $self->{protocol} or Carp::croak(q/Protocol::Redis implementation doesn't support APIv1/);
@@ -262,7 +260,7 @@ sub _subscribe_generic {
 
 sub execute {
   my ($self, @commands) = @_;
-  my($cb, $process);
+  my ($cb, $process);
 
   if (ref $commands[-1] eq 'CODE') {
     $cb = pop @commands;
@@ -273,19 +271,19 @@ sub execute {
 
   for my $cmd (@commands) {
     $cmd->[0] = uc $cmd->[0];
-    if(ref $cmd->[-1] eq 'HASH') {
-        splice @$cmd, -1, 1, map { $_ => $cmd->[-1]{$_} } keys %{ $cmd->[-1] };
+    if (ref $cmd->[-1] eq 'HASH') {
+      splice @$cmd, -1, 1, map { $_ => $cmd->[-1]{$_} } keys %{$cmd->[-1]};
     }
   }
 
   my $mqueue = $self->{message_queue} ||= [];
   my $cqueue = $self->{cb_queue}      ||= [];
 
-  if($cb) {
+  if ($cb) {
     my @res;
     my $process = sub {
-      if(my $command = shift @commands) {
-        push @res, $command->[0] eq 'HGETALL' ? $_[1] ? { @{ $_[1] } } : undef : $_[1];
+      if (my $command = shift @commands) {
+        push @res, $command->[0] eq 'HGETALL' ? $_[1] ? {@{$_[1]}} : undef : $_[1];
       }
       else {
         push @res, undef;
@@ -295,7 +293,7 @@ sub execute {
     push @$cqueue, ($process) x int @commands;
   }
   else {
-    push @$cqueue, (sub {}) x int @commands;
+    push @$cqueue, (sub { }) x int @commands;
   }
 
   push @$mqueue, @commands;
@@ -314,12 +312,11 @@ sub _send_next_message {
     my $cmd_arg = [];
 
     foreach my $token (@$args) {
-      $token = Encode::encode($self->encoding, $token)
-        if $self->encoding;
+      $token = Encode::encode($self->encoding, $token) if $self->encoding;
       push @$cmd_arg, {type => '$', data => $token};
     }
 
-    $self->_write({ type => '*', data => $cmd_arg }) or last;
+    $self->_write({type => '*', data => $cmd_arg}) or last;
   }
 }
 
@@ -352,7 +349,7 @@ sub _reencode_message {
 sub _return_command_data {
   my ($self, $message) = @_;
   my $data = $self->_reencode_message($message);
-  my $cb = shift @{$self->{cb_queue}};
+  my $cb   = shift @{$self->{cb_queue}};
 
   eval {
     $self->$cb($data) if $cb;
@@ -364,17 +361,19 @@ sub _return_command_data {
 }
 
 sub _clone {
-  my($self, $class, @args) = @_;
+  my ($self, $class, @args) = @_;
 
   $class ||= ref $self;
-  $class->new({
-    encoding => $self->encoding,
-    ioloop => $self->ioloop,
-    protocol_redis => $self->protocol_redis,
-    server => $self->server,
-    timeout => $self->timeout,
-    @args,
-  });
+  $class->new(
+    {
+      encoding       => $self->encoding,
+      ioloop         => $self->ioloop,
+      protocol_redis => $self->protocol_redis,
+      server         => $self->server,
+      timeout        => $self->timeout,
+      @args,
+    }
+  );
 }
 
 sub _inform_queue {
@@ -404,7 +403,7 @@ sub _on_blpop {
   $self->{connections}{$id} = $self->_clone(undef, timeout => 0);
 
   $handler = sub {
-    $self->emit($id => '', reverse @{ $_[1] });
+    $self->emit($id => '', reverse @{$_[1]});
     $self->{connections}{$id}->$method(@args, 0, $handler);
   };
 
@@ -419,31 +418,34 @@ sub _on_message {
 
   Scalar::Util::weaken($self);
   $self->{connections}{$id} and return;
-  $self->{connections}{$id} = $self->_clone(undef, timeout => 0, cb_queue => [(sub {}) x (@channels - 1)]);
+  $self->{connections}{$id} = $self->_clone(undef, timeout => 0, cb_queue => [(sub { }) x (@channels - 1)]);
   $self->{connections}{$id}->on(error => sub { $self->emit($id => $_[1], undef, undef); });
   $self->{connections}{$id}->execute(
-    [ subscribe => @channels ],
+    [subscribe => @channels],
     sub {
       my ($redis) = @_;
-      $redis->protocol->on_message(sub {
-        $self or return; # may be undef on global destruction
-        my $data = $self->_reencode_message($_[1]);
-        $self->emit($id => '', @$data[2, 1]);
-      }),
+      $redis->protocol->on_message(
+        sub {
+          $self or return;    # may be undef on global destruction
+          my $data = $self->_reencode_message($_[1]);
+          $self->emit($id => '', @$data[2, 1]);
+        }
+        ),
+        ;
     },
   );
 }
 
 sub _write {
-  my($self, $what) = @_;
+  my ($self, $what) = @_;
   my $ioloop = $self->ioloop;
-  my($stream, $message);
+  my ($stream, $message);
 
-  unless($stream = $ioloop->stream($self->{connection} || 0)) {
+  unless ($stream = $ioloop->stream($self->{connection} || 0)) {
     $self->disconnect;
     return;
   }
-  if(!$ioloop->is_running and $stream->is_readable) {
+  if (!$ioloop->is_running and $stream->is_readable) {
     $stream->close;
     $self->disconnect;
     return;
@@ -452,7 +454,7 @@ sub _write {
   $message = $self->protocol->encode($what);
   $stream->write($message);
 
-  if(DEBUG) {
+  if (DEBUG) {
     $message =~ s/\r?\n/','/g;
     warn "REDIS[@{[$self->{connection}]}] <<< ['$message']\n";
   }
@@ -464,8 +466,8 @@ sub _server_to_url {
   my $self = shift;
   my $url;
 
-  if($self->server =~ m{^[^:]+(:\d+)?$}) {
-    $url = Mojo::URL->new('redis://' .$self->server);
+  if ($self->server =~ m{^[^:]+(:\d+)?$}) {
+    $url = Mojo::URL->new('redis://' . $self->server);
   }
   else {
     $url = Mojo::URL->new($self->server);
